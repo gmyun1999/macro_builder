@@ -12,8 +12,8 @@ class UserService:
         self.user_token_manager: ITokenManager = UserTokenManager()
         self.user_repo: IUserRepo = UserRepo()
 
-    def create_access_token(self, user_id: str):
-        return self.user_token_manager.create_user_access_token(user_id)
+    def create_access_token(self, user_id: str) -> dict:
+        return {"access" : self.user_token_manager.create_user_access_token(user_id)}
 
     def get_user_from_oauth_user(self, oauth_user: OAuthUser) -> UserVo | None:
         oauth_id = oauth_user.id

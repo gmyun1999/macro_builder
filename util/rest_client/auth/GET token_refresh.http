@@ -1,0 +1,4 @@
+GET {{macro-host}}/user/token-refresh
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+

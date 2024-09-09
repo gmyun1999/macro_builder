@@ -23,10 +23,10 @@ class UserTokenParser(ITokenParser):
         try:
             payload = self.decode_token(token)
 
-            if payload[UserTokenPayload.type] != validate_type:
+            if payload[UserTokenPayload.FIELD_TYPE] != validate_type:
                 return None, response_msg.TokenMessage.WRONG_TYPE
 
-            if not payload[UserTokenPayload.role] in allowed_roles:
+            if not payload[UserTokenPayload.FIELD_ROLE] in allowed_roles:
                 return None, response_msg.TokenMessage.ROLE_NO_PERMISSION
 
             user_token_payload_vo = UserTokenPayload.from_dto(payload)

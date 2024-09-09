@@ -76,6 +76,6 @@ class RefreshTokenView(APIView):
         elif token_payload.user_id is not None:
             user_id = token_payload.user_id
 
-        token: str = self.user_service.create_access_token(user_id=user_id)
+        token: dict = self.user_service.create_access_token(user_id=user_id)
 
         return JsonResponse(status=status.HTTP_200_OK, data=token)
