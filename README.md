@@ -67,16 +67,21 @@
 
 ## 6. 프로젝트 실행
 
-1. Django 마이그레이션 실행:
+1. 가상환경 들어가기:
   ```
-  poetry run python manage.py migrate
+  poetry shell
   ```
 
-2. Poetry 환경에서 Django 개발 서버를 실행합니다:
+2. Django 마이그레이션 실행:
    ```
-   poetry run python manage.py runserver
+   python manage.py migrate
    ```
-2. 웹 브라우저에서 `http://127.0.0.1:8000/`로 접속하여 프로젝트를 확인합니다.
+
+3. Django 개발 서버를 실행합니다:
+   ```
+   python manage.py runserver
+   ```
+4. 웹 브라우저에서 `http://127.0.0.1:8000/`로 접속하여 프로젝트를 확인합니다.
 
 ## 추가 명령어
 
