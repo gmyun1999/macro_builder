@@ -1,4 +1,5 @@
 import httpx
+
 from macro_be.settings import BASE_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from user.domain.user import OAuthType, OAuthUser
 from user.service.oauth.i_oauth_provider import IOAuthProvider

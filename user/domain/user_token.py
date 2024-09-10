@@ -30,4 +30,3 @@ class UserTokenPayload(Domain):
     role: str
     exp: int  # 만료시간
     iat: int  # 발급시간
-
