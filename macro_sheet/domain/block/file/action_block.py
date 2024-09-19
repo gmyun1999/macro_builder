@@ -33,9 +33,9 @@ class FileTargetDetail(StrEnum):
 @dataclass
 class FileActionBlock(ActionBlock):
     action: FileActionType
-    target_loc: str
-    target_detail: FileTargetDetail
-    replace_text: str | None
+    target_loc: str  # ex) 파일의 위치
+    target_detail: FileTargetDetail  # ex) 파일의 이름, 파일 그자체 등등
+    replace_text: str | None  # ex) 파일 이름 교체와 같이
     chmod_value: int | None
     destination: str | None
 
@@ -44,4 +44,4 @@ class FileActionBlock(ActionBlock):
         self.target = TargetType.FILE
 
 
-# 특정 "condition"에 "target_loc" 에 있는 target의 "target_detail"을 "destination"로 "action" 한다.
+# 문법: "target_loc" 에 있는 target의 "target_detail"을 "destination"로 "action" 한다.

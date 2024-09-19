@@ -13,5 +13,4 @@ class BlockType(StrEnum):
 
 @dataclass
 class Block(Domain, ABC):
-    block_id: str
     block_type: BlockType = field(init=False)

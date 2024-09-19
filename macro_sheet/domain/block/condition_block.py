@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import Any
 
 from macro_sheet.domain.block.block import Block, BlockType
 from macro_sheet.domain.block.file.condition_block import FileConditionType
@@ -15,8 +16,9 @@ class ConditionType(StrEnum):
 @dataclass
 class ConditionBlock(Block):
     condition_type: ConditionType
-    detail_condition_type: list[FileConditionType]  # Optional for non-file conditions
+    detail_condition_type: list[FileConditionType | Any]
     value: str = ""
+    body: list[Block | None] = field(default_factory=list)
 
     def __post_init__(self):
         self.block_type = BlockType.CONDITION
@@ -27,4 +29,8 @@ class ConditionBlock(Block):
 #          "condition_type": "FILE"
 #          "detail_condition_type": "file_extension",
 #          "value": ".txt"
+#          "body": [
+#
+#
+#          ]
 #      }
