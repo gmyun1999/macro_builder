@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
-from macro_sheet.domain.block.action_block import ActionBlock, TargetType
+from macro_sheet.domain.block.action_block.action_block import ActionBlock, TargetType
+from macro_sheet.domain.block.block import BlockType
+from macro_sheet.domain.registry import register_block_type
 
 
 class FileActionType(StrEnum):
@@ -30,6 +32,7 @@ class FileTargetDetail(StrEnum):
     FILE_ACCESS_DATE = "file_access_date"  # 파일 접근 시간 작업
 
 
+@register_block_type(BlockType.FILE_ACTION_BLOCK)
 @dataclass
 class FileActionBlock(ActionBlock):
     action: FileActionType
@@ -38,10 +41,11 @@ class FileActionBlock(ActionBlock):
     replace_text: str | None  # ex) 파일 이름 교체와 같이
     chmod_value: int | None
     destination: str | None
+    target: TargetType = TargetType.FILE
 
     def __post_init__(self):
         super().__post_init__()
-        self.target = TargetType.FILE
+        self.block_type = BlockType.FILE_ACTION_BLOCK
 
 
-# 문법: "target_loc" 에 있는 target의 "target_detail"을 "destination"로 "action" 한다.
+# FileActionBlock문법: "target_loc" 에 있는 target의 "target_detail"을 "destination"로 "action" 한다.
