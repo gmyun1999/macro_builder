@@ -7,29 +7,29 @@ from macro_sheet.domain.registry import register_block_type
 
 
 class FileActionType(StrEnum):
-    COPY = "copy"
-    MOVE = "move"
-    DELETE = "delete"
-    REPLACE = "replace"
-    ARCHIVE = "archive"
-    EXTRACT = "extract"
-    UPLOAD = "upload"
-    DOWNLOAD = "download"
-    CHMOD = "chmod"
+    COPY = "COPY"
+    MOVE = "MOVE"
+    DELETE = "DELETE"
+    REPLACE = "REPLACE"
+    ARCHIVE = "ARCHIVE"
+    EXTRACT = "EXTRACT"
+    UPLOAD = "UPLOAD"
+    DOWNLOAD = "DOWNLOAD"
+    CHMOD = "CHMOD"
 
 
 class FileTargetDetail(StrEnum):
-    FILE_NAME = "file_name"  # 파일 이름만 작업
-    FILE_CONTENT = "file_content"  # 파일 내용만 작업
-    FILE_METADATA = "file_metadata"  # 파일의 메타데이터 작업
-    FILE = "file"  # 파일 전체 작업 (이름, 내용 포함)
-    FILE_EXTENSION = "file_extension"  # 파일 확장자 작업
-    FILE_SIZE = "file_size"  # 파일 크기 작업
-    FILE_OWNER = "file_owner"  # 파일 소유자 작업
-    FILE_PERMISSIONS = "file_permissions"  # 파일 권한 작업
-    FILE_CREATION_DATE = "file_creation_date"  # 파일 생성 시간 작업
-    FILE_MODIFICATION_DATE = "file_modification_date"  # 파일 수정 시간 작업
-    FILE_ACCESS_DATE = "file_access_date"  # 파일 접근 시간 작업
+    FILE_NAME = "FILE_NAME"  # 파일 이름만 작업
+    FILE_CONTENT = "FILE_CONTENT"  # 파일 내용만 작업
+    FILE_METADATA = "FILE_METADATA"  # 파일의 메타데이터 작업
+    FILE = "FILE"  # 파일 전체 작업 (이름, 내용 포함)
+    FILE_EXTENSION = "FILE_EXTENSION"  # 파일 확장자 작업
+    FILE_SIZE = "FILE_SIZE"  # 파일 크기 작업
+    FILE_OWNER = "FILE_OWNER"  # 파일 소유자 작업
+    FILE_PERMISSIONS = "FILE_PERMISSIONS"  # 파일 권한 작업
+    FILE_CREATION_DATE = "FILE_CREATION_DATE"  # 파일 생성 시간 작업
+    FILE_MODIFICATION_DATE = "FILE_MODIFICATION_DATE"  # 파일 수정 시간 작업
+    FILE_ACCESS_DATE = "FILE_ACCESS_DATE"  # 파일 접근 시간 작업
 
 
 @register_block_type(BlockType.FILE_ACTION_BLOCK)

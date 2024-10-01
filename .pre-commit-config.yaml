@@ -9,3 +9,4 @@ repos:
     hooks:
       - id: black
         language_version: python3.11
+        exclude: generated_gui\.py

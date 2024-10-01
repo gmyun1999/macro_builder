@@ -7,8 +7,8 @@ from macro_sheet.domain.registry import register_block_type
 
 
 class ControlType(StrEnum):
-    WHILE = "while"
-    IF = "if"
+    WHILE = "WHILE"
+    IF = "IF"
 
 
 @register_block_type(BlockType.BASE_CONTROL_BLOCK)

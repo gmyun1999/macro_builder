@@ -1,5 +1,7 @@
-# from django.urls import path
+from django.urls import path
 
-# urlpatterns = [
+from macro_sheet.interface.views import TestView
 
-# ]
+urlpatterns = [
+    path("test/", view=TestView.as_view(), name="test"),
+]

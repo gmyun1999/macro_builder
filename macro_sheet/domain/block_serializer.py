@@ -28,7 +28,6 @@ class GenericSerializer:
         origin = get_origin(field_type)
         args = get_args(field_type)
 
-        # Handle Optional types (e.g., Type | None)
         if origin is Union and type(None) in args:
             non_none_args = [arg for arg in args if arg is not type(None)]
             if not non_none_args:
@@ -37,14 +36,12 @@ class GenericSerializer:
             if value is None:
                 return None
 
-        # Handle Enums
         if isinstance(field_type, type) and issubclass(field_type, Enum):
             try:
                 return field_type(value)
             except ValueError:
                 raise ValueError(f"{field_name} must be a valid {field_type.__name__}.")
 
-        # Handle list types (e.g., list[Block])
         if origin is list:
             item_type = args[0]
             if not isinstance(value, list):
@@ -60,7 +57,6 @@ class GenericSerializer:
                     self.errors[f"{field_name}[{index}]"] = str(ve)
             return validated_list
 
-        # Handle dict types (e.g., dict[str, Any])
         if origin is dict:
             key_type, val_type = args
             if not isinstance(value, dict):
@@ -79,7 +75,6 @@ class GenericSerializer:
                     self.errors[f"{field_name}[{key}]"] = str(ve)
             return validated_dict
 
-        # Handle nested dataclasses (Blocks)
         if is_dataclass(field_type) and issubclass(field_type, Block):
             if not isinstance(value, dict):
                 raise ValueError(
@@ -92,7 +87,6 @@ class GenericSerializer:
                 self.errors[field_name] = str(nested_serializer.errors)
                 return None
 
-        # Handle basic types
         if not isinstance(value, field_type):
             raise ValueError(f"{field_name} must be of type {field_type.__name__}.")
         return value
@@ -103,9 +97,7 @@ class GenericSerializer:
             field_name = field_info.name
             field_type = field_info.type
 
-            # Handle missing fields
             if field_name not in self.data:
-                # Check if the field has a default or is Optional
                 if field_info.default is not field_info.default_factory or (
                     get_origin(field_type) is Union
                     and type(None) in get_args(field_type)
@@ -121,7 +113,6 @@ class GenericSerializer:
 
             value = self.data[field_name]
 
-            # Handle Optional fields
             if get_origin(field_type) is Union and type(None) in get_args(field_type):
                 if value is None:
                     validated_data[field_name] = None

@@ -1,0 +1,17 @@
+# File Action: {{ block.action }}
+def {{ block.action|lower }}_file():
+    target_loc = "{{ block.target_loc }}"
+    target_detail = "{{ block.target_detail }}"
+    {% if block.destination %}
+    destination = "{{ block.destination }}"
+    {% endif %}
+    {% if block.action in ['COPY', 'MOVE', 'REPLACE'] %}
+    replace_text = "{{ block.replace_text }}" if "{{ block.replace_text }}" != "None" else None
+    chmod_value = "{{ block.chmod_value }}" if "{{ block.chmod_value }}" != "None" else None
+    {% endif %}
+    # 파일을 {{ block.action }}하는 로직을 여기에 추가
+    print("{{ block.action }} 파일: ", target_loc, 
+          "{% if block.destination %}에서 {{ block.destination }}으로{% endif %}")
+    {% if block.action == 'CHMOD' %}
+    print("파일 권한을 변경: ", target_loc, "을(를) ", chmod_value, "으로")
+    {% endif %}

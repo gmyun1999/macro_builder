@@ -1,0 +1,17 @@
+# Control Block: {{ block.control_type }}
+def {{ block.control_type.lower() }}_control():
+    {% for condition in block.conditions %}
+    if not {{ 'check_' + condition.condition_type.lower() }}():
+        return
+    {% endfor %}
+    {% if block.control_type.upper() == 'WHILE' %}
+    while True:
+        {% for stmt in body_code %}
+        {{ stmt }}
+        {% endfor %}
+    {% elif block.control_type.upper() == 'IF' %}
+    if True:
+        {% for stmt in body_code %}
+        {{ stmt }}
+        {% endfor %}
+    {% endif %}
