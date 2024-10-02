@@ -1,65 +1,65 @@
-# import sys
-# from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 
 
-# from control_block import *
+from control_block import *
 
-# from file_action import *
+from file_action import *
 
 
 
-# # File Action: MOVE
-# def move_file():
-#     target_loc = "/source/path"
-#     target_detail = "FILE_NAME"
+# File Action: MOVE
+def move_file():
+    target_loc = "/source/path"
+    target_detail = "FILE_NAME"
     
-#     destination = "/destination/path"
+    destination = "/destination/path"
     
     
-#     replace_text = "None" if "None" != "None" else None
-#     chmod_value = "None" if "None" != "None" else None
+    replace_text = "None" if "None" != "None" else None
+    chmod_value = "None" if "None" != "None" else None
     
-#     # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ MOVEï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¿¡ ï¿½ß°ï¿½
-#     print("MOVE ï¿½ï¿½ï¿½ï¿½: ", target_loc, 
-#           "ï¿½ï¿½ï¿½ï¿½ /destination/pathï¿½ï¿½ï¿½ï¿½")
+    # ÆÄÀÏÀ» MOVEÇÏ´Â ·ÎÁ÷À» ¿©±â¿¡ Ãß°¡
+    print("MOVE ÆÄÀÏ: ", target_loc, 
+          "¿¡¼­ /destination/pathÀ¸·Î")
     
 
-# # Control Block: WHILE
-# def while_control():
+# Control Block: WHILE
+def while_control():
     
-#     if not check_file_size_gt():
-#         return
+    if not check_file_size_gt():
+        return
     
     
-#     while True:
+    while True:
         
-#         move_file()
+        move_file()
         
     
 
 
-# class GeneratedGUI(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.init_ui()
+class GeneratedGUI(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
 
-#     def init_ui(self):
-#         layout = QVBoxLayout()
+    def init_ui(self):
+        layout = QVBoxLayout()
         
-#         button = QPushButton('Execute')
-#         button.clicked.connect(execute_actions)
-#         layout.addWidget(button)
+        button = QPushButton('Execute')
+button.clicked.connect(execute_actions)
+layout.addWidget(button)
         
-#         self.setLayout(layout)
-#         self.setWindowTitle('Generated GUI')
+        self.setLayout(layout)
+        self.setWindowTitle('Generated GUI')
 
-# def execute_actions():
+def execute_actions():
     
-#     while_control()
+    while_control()
     
 
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     gui = GeneratedGUI()
-#     gui.show()
-#     sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    gui = GeneratedGUI()
+    gui.show()
+    sys.exit(app.exec_())

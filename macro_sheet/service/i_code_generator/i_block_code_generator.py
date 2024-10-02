@@ -10,18 +10,6 @@ from macro_sheet.domain.block.control_block.control_block import ControlBlock
 from macro_sheet.domain.worksheet import Worksheet
 
 
-class IWorkSheetCodeGenerator(ABC):
-    @abstractmethod
-    def generate_workflow_code(self, workflow: Worksheet) -> str:
-        pass
-
-
-class IFlowSheetCodeGenerator(ABC):
-    @abstractmethod
-    def generate_workflow_code(self, workflow: Worksheet) -> str:
-        pass
-
-
 class IGuiCodeGeneratorFromBlock(ABC):
     @abstractmethod
     def generate_gui_code(self, block: Block) -> str:
