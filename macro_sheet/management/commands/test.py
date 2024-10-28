@@ -71,6 +71,7 @@ class Command(BaseCommand):
             "destination": "/destination/path",
             "target": "FILE",
         }
+
         nested_control_data = {
             "id": "control001",
             "block_type": "BASE_CONTROL_BLOCK",

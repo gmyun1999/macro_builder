@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
+from django.http import JsonResponse
 from pydantic import BaseModel, Field
+from rest_framework import status
 from rest_framework.views import APIView
 
 from common.interface.validators import validate_body
@@ -24,6 +26,12 @@ class TestView(APIView):
         serializer = GenericSerializer(block_dict)
         if serializer.is_valid():
             domain = serializer.to_domain_object()
+
+        # if validator 가 올바르게 작동했을경우:
+        # return JsonResponse(status=status.HTTP_200_OK, data='')
+        # else:
+        #     return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data='')
+
         # 도메인 객체를 저장한다.
         # 도메인 객체를 jinja2 템플릿으로 변경시킨다.
         # 생성한 템플릿을 json으로 패키지 서버로 보낸다.

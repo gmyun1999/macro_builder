@@ -1,0 +1,109 @@
+POST {{macro-host}}/test/
+Content-Type: application/json
+
+ {
+            "id": "control001",
+            "block_type": "BASE_CONTROL_BLOCK",
+            "control_type": "WHILE",
+            "conditions": [
+                {"id": "cond002", "block_type": "BASE_CONDITION_BLOCK"},
+                {
+                    "id": "filecond002",
+                    "block_type": "FILE_CONDITION_BLOCK",
+                    "condition_type": "FILE",
+                    "detail_condition_type": ["FILE_OWNER"],
+                    "value": "admin",
+                },
+            ],
+            "body": [
+                {
+                    "id": "control001",
+                    "block_type": "BASE_CONTROL_BLOCK",
+                    "control_type": "WHILE",
+                    "conditions": [
+                        {"id": "cond002", "block_type": "BASE_CONDITION_BLOCK"},
+                        {
+                            "id": "filecond002",
+                            "block_type": "FILE_CONDITION_BLOCK",
+                            "condition_type": "FILE",
+                            "detail_condition_type": ["FILE_OWNER"],
+                            "value": "admin",
+                        },
+                    ],
+                    "body": [
+                        {
+                            "id": "fileaction001",
+                            "block_type": "FILE_ACTION_BLOCK",
+                            "action": "COPY",
+                            "target_loc": "/source/path",
+                            "target_detail": "FILE_NAME",
+                            "replace_text": "None",
+                            "chmod_value": "None",
+                            "destination": "/destination/path",
+                            "target": "FILE",
+                        },
+                        {"id": "simple002", "block_type": "BASE_CONDITION_BLOCK"},
+                    ],
+                },
+                {
+                    "id": "control001",
+                    "block_type": "BASE_CONTROL_BLOCK",
+                    "control_type": "WHILE",
+                    "conditions": [
+                        {"id": "cond002", "block_type": "BASE_CONDITION_BLOCK"},
+                        {
+                            "id": "filecond002",
+                            "block_type": "FILE_CONDITION_BLOCK",
+                            "condition_type": "FILE",
+                            "detail_condition_type": ["FILE_OWNER"],
+                            "value": "admin",
+                        },
+                    ],
+                    "body": [
+                        {
+                            "id": "fileaction001",
+                            "block_type": "FILE_ACTION_BLOCK",
+                            "action": "COPY",
+                            "target_loc": "/source/path",
+                            "target_detail": "FILE_NAME",
+                            "replace_text": "None",
+                            "chmod_value": "None",
+                            "destination": "/destination/path",
+                            "target": "FILE",
+                        },
+                        {
+                            "id": "control001",
+                            "block_type": "BASE_CONTROL_BLOCK",
+                            "control_type": "WHILE",
+                            "conditions": [
+                                {"id": "cond002", "block_type": "BASE_CONDITION_BLOCK"},
+                                {
+                                    "id": "filecond002",
+                                    "block_type": "FILE_CONDITION_BLOCK",
+                                    "condition_type": "FILE",
+                                    "detail_condition_type": ["FILE_OWNER"],
+                                    "value": "admin",
+                                },
+                            ],
+                            "body": [
+                                {
+                                    "id": "fileaction001",
+                                    "block_type": "FILE_ACTION_BLOCK",
+                                    "action": "COPY",
+                                    "target_loc": "/source/path",
+                                    "target_detail": "FILE_NAME",
+                                    "replace_text": "None",
+                                    "chmod_value": "None",
+                                    "destination": "/destination/path",
+                                    "target": "FILE",
+                                },
+                                {
+                                    "id": "simple002",
+                                    "block_type": "BASE_CONDITION_BLOCK",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }
