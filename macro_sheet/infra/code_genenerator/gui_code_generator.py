@@ -1,11 +1,13 @@
 import subprocess
 from pathlib import Path
-from typing import Any, Callable, Dict
+from typing import Callable, Dict, cast
 
 from jinja2 import Environment, FileSystemLoader
 from PyQt5 import QtWidgets
 
-from macro_sheet.domain.block.block import Block, FileSystemBlock
+from macro_be import settings
+from macro_sheet.domain.block.block import Block
+from macro_sheet.domain.block.file_system_block.file_system_block import FileSystemBlock
 
 
 class GuiCodeGeneratorFromBlock:
@@ -41,11 +43,13 @@ class GuiCodeGeneratorFromBlock:
         # 2. 변환 함수 호출하여 GUI 코드 생성
         return self.block_to_gui_code_map[block_type](block)
 
-    def generate_filesystemblock_gui_code(self, block: FileSystemBlock) -> str:
+    def generate_filesystemblock_gui_code(self, block: Block) -> str:
         """
         FileSystemBlock 객체를 받아 PowerShell 명령어를 실행하는 PyQt GUI 코드를 생성.
         """
         # 1. 유효성 검사
+        block = cast(FileSystemBlock, block)
+
         if not block.validate():
             raise ValueError("유효하지 않은 FileSystemBlock입니다.")
 
@@ -56,7 +60,7 @@ class GuiCodeGeneratorFromBlock:
             raise ValueError(f"PowerShell 명령어 생성 오류: {e}")
 
         # 3. Jinja2 템플릿 로드
-        template = self.env.get_template("main.py.jinja")
+        template = self.env.get_template("main.py.j2")
 
         # 4. 템플릿 렌더링 (command 변수를 템플릿에 전달)
         rendered_code = template.render(command=command)

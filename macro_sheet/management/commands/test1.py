@@ -1,20 +1,13 @@
+import traceback
+
 from django.core.management.base import BaseCommand
 
-from macro_sheet.domain.block.action_block.action_block import TargetType
-from macro_sheet.domain.block.action_block.file_action_block import (
-    FileActionBlock,
-    FileActionType,
-    FileTargetDetail,
-)
 from macro_sheet.domain.block.block import BlockType
-from macro_sheet.domain.block.condition_block.condition_block import ConditionType
-from macro_sheet.domain.block.condition_block.file_condition_block import (
-    FileConditionBlock,
-    FileConditionType,
-)
-from macro_sheet.domain.block.control_block.control_block import (
-    ControlBlock,
-    ControlType,
+from macro_sheet.domain.block.file_system_block.file_system_block import (
+    FileConditionDetail,
+    FileSystemAction,
+    FileSystemBlock,
+    FileSystemType,
 )
 from macro_sheet.infra.code_genenerator.gui_code_generator import (
     GuiCodeGeneratorFromBlock,
@@ -25,129 +18,105 @@ from macro_sheet.service.i_code_generator.i_block_code_generator import (
 
 
 class Command(BaseCommand):
-    help = "Benchmark GenericSerializer deserialization performance"
+    help = "Benchmark FileSystemBlock to PyQt GUI code generation performance"
 
     def handle(self, *args, **kwargs):
-        # Define all test cases
-        file_condition = FileConditionBlock(
-            id="filecond001",
-            block_type=BlockType.FILE_CONDITION_BLOCK,
-            condition_type=ConditionType.FILE,  # 대분류: 파일 관련 조건임을 명시
-            detail_condition_type=[FileConditionType.FILE_SIZE_GT],  # 구체적 조건
-            value="400",
-        )
-
-        # FileActionBlock 생성
-        file_action = FileActionBlock(
-            id="fileaction001",
-            block_type=BlockType.FILE_ACTION_BLOCK,  # BlockType 열거형으로 변경
-            action=FileActionType.MOVE,  # FileActionType 열거형으로 변경
-            target_loc="/source/path",
-            target_detail=FileTargetDetail.FILE_NAME,  # FileTargetDetail 열거형으로 변경
-            replace_text=None,
-            chmod_value=None,
-            destination="/destination/path",
-            target=TargetType.FILE,  # TargetType 열거형으로 변경
-        )
-
-        # ControlBlock (WHILE) 생성
-        control_block = ControlBlock(
-            id="control001",
-            block_type=BlockType.BASE_CONTROL_BLOCK,  # BlockType 열거형으로 변경
-            control_type=ControlType.WHILE,  # ControlType 열거형으로 변경
-            conditions=[file_condition],
-            body=[file_action],
-        )
-        # 최하위의 액션 블록 (예: 특정 파일 이동)
-        deep_action_block = FileActionBlock(
-            id="action_deep",
-            block_type=BlockType.FILE_ACTION_BLOCK,
-            action=FileActionType.MOVE,
-            target_loc="/deep/source/path",
-            target_detail=FileTargetDetail.FILE_NAME,
-            replace_text=None,
-            chmod_value=None,
-            destination="/deep/destination/path",
-            target=TargetType.FILE,
-        )
-
-        # 조건문이 있는 블록 (예: 파일 이름이 'data'로 시작하는지 확인)
-        deep_if_block = ControlBlock(
-            id="if_deep",
-            block_type=BlockType.BASE_CONTROL_BLOCK,
-            control_type=ControlType.IF,
-            conditions=[
-                FileConditionBlock(
-                    id="cond_deep",
-                    block_type=BlockType.FILE_CONDITION_BLOCK,
-                    condition_type=ConditionType.FILE,
-                    detail_condition_type=[FileConditionType.FILE_NAME_STARTSWITH],
-                    value="data",
-                )
-            ],
-            body=[deep_action_block],
-        )
-
-        # 더 상위의 while 블록
-        inner_while_block = ControlBlock(
-            id="while_inner",
-            block_type=BlockType.BASE_CONTROL_BLOCK,
-            control_type=ControlType.WHILE,
-            conditions=[
-                FileConditionBlock(
-                    id="cond_inner",
-                    block_type=BlockType.FILE_CONDITION_BLOCK,
-                    condition_type=ConditionType.FILE,
-                    detail_condition_type=[FileConditionType.FILE_SIZE_GT],
-                    value="100",
-                )
-            ],
-            body=[deep_if_block],
-        )
-
-        # 또 다른 상위의 while 블록
-        outer_while_block = ControlBlock(
-            id="while_outer",
-            block_type=BlockType.BASE_CONTROL_BLOCK,
-            control_type=ControlType.WHILE,
-            conditions=[
-                FileConditionBlock(
-                    id="cond_outer",
-                    block_type=BlockType.FILE_CONDITION_BLOCK,
-                    condition_type=ConditionType.FILE,
-                    detail_condition_type=[FileConditionType.FILE_SIZE_GT],
-                    value="200",
-                )
-            ],
-            body=[inner_while_block],
-        )
-
-        # 최상위 while 블록
-        top_while_block = ControlBlock(
-            id="while_top",
-            block_type=BlockType.BASE_CONTROL_BLOCK,
-            control_type=ControlType.WHILE,
-            conditions=[
-                FileConditionBlock(
-                    id="cond_top",
-                    block_type=BlockType.FILE_CONDITION_BLOCK,
-                    condition_type=ConditionType.FILE,
-                    detail_condition_type=[FileConditionType.FILE_SIZE_GT],
-                    value="400",
-                )
-            ],
-            body=[outer_while_block],
-        )
+        # 테스트 케이스 정의 (기대하는 GUI 코드 포함)
+        test_cases = [
+            # 케이스 1: 파일 복사
+            {
+                "block": FileSystemBlock(
+                    block_type=BlockType.FILE_SYSTEM_BLOCK,
+                    target=FileSystemType.FILE,
+                    action=FileSystemAction.COPY,
+                    loc="/C/user/documents/",
+                    condition=[{FileConditionDetail.FILE_EXTENSION: "pdf"}],
+                    destination="/C/user/backup",
+                    rename=None,
+                ),
+                "expected_code": (
+                    "Get-ChildItem -Path '/C/user/documents/' | "
+                    "Where-Object { $_.Extension -eq 'pdf' } | "
+                    "Copy-Item -Destination '/C/user/backup'"
+                ),
+            },
+            # 케이스 2: 파일 이동
+            {
+                "block": FileSystemBlock(
+                    block_type=BlockType.FILE_SYSTEM_BLOCK,
+                    target=FileSystemType.FILE,
+                    action=FileSystemAction.MOVE,
+                    loc="/C/user/photos/",
+                    condition=[{FileConditionDetail.NAME_ENDSWITH: "vacation"}],
+                    destination="/C/user/archive",
+                    rename=None,
+                ),
+                "expected_code": (
+                    "Get-ChildItem -Path '/C/user/photos/' | "
+                    "Where-Object { $_.Name -like '*vacation' } | "
+                    "Move-Item -Destination '/C/user/archive'"
+                ),
+            },
+            # 케이스 3: 이름 변경
+            {
+                "block": FileSystemBlock(
+                    block_type=BlockType.FILE_SYSTEM_BLOCK,
+                    target=FileSystemType.FILE,
+                    action=FileSystemAction.RENAME,
+                    loc="/C/user/homework/",
+                    condition=[{FileConditionDetail.FILE_EXTENSION: "docx"}],
+                    destination=None,
+                    rename="completed_homework",
+                ),
+                "expected_code": (
+                    "$counter = 1; Get-ChildItem -Path '/C/user/homework/' | "
+                    "Where-Object { $_.Extension -eq 'docx' } | "
+                    "ForEach-Object { Rename-Item -Path $_.FullName -NewName ('completed_homework' + $counter + $_.Extension); $counter++ }"
+                ),
+            },
+            # 케이스 4: 파일 삭제
+            {
+                "block": FileSystemBlock(
+                    block_type=BlockType.FILE_SYSTEM_BLOCK,
+                    target=FileSystemType.FILE,
+                    action=FileSystemAction.DELETE,
+                    loc="/C/user/temp/",
+                    condition=[{FileConditionDetail.FILE_SIZE_LT: "500"}],
+                    destination=None,
+                    rename=None,
+                ),
+                "expected_code": (
+                    "Get-ChildItem -Path '/C/user/temp/' | "
+                    "Where-Object { $_.Length -lt 500 } | "
+                    "Remove-Item -Recurse"
+                ),
+            },
+        ]
 
         # 코드 생성기 인스턴스 생성
         generator: IGuiCodeGeneratorFromBlock = GuiCodeGeneratorFromBlock(
             template_dir="templates"
         )
 
-        # GUI 코드 생성
-        gui_code = generator.generate_gui_code(top_while_block)
+        # 테스트 실행
+        for i, test_case in enumerate(test_cases, start=1):
+            block = test_case["block"]
+            expected_code = test_case["expected_code"]
 
-        with open("generated_gui.py", "w", encoding="utf-8") as f:
-            f.write(gui_code)
+            try:
+                # GUI 코드 생성
+                generated_code = generator.generate_gui_code(block)
 
-        print("GUI 코드가 'generated_gui.py' 파일로 생성되었습니다.")
+                # 기대하는 GUI 코드와 생성된 GUI 코드 비교
+                if expected_code in generated_code:
+                    print(f"Test Case {i}: 성공 - 기대하는 코드가 생성되었습니다.")
+                else:
+                    print(f"Test Case {i}: 실패 - 기대하는 코드와 생성된 코드가 일치하지 않습니다.")
+                    print("Expected Code:")
+                    print(expected_code)
+                    print("Generated Code:")
+                    print(generated_code)
+
+            except Exception as e:
+                print(f"Test Case {i}에서 GUI 코드 생성 오류: {e}")
+                traceback.print_exc()
