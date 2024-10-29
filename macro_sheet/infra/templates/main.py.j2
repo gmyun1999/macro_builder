@@ -1,34 +1,31 @@
+# main.py.jinja
+from PyQt5 import QtWidgets
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+import subprocess
 
-{% for import_stmt in imports %}
-{{ import_stmt }}
-{% endfor %}
-
-{% for action_code in actions_definitions %}
-{{ action_code }}
-{% endfor %}
-
-class GeneratedGUI(QWidget):
+class CommandGuiApp(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.init_ui()
+        self.initUI()
 
-    def init_ui(self):
-        layout = QVBoxLayout()
-        {% for widget in widgets %}
-        {{ widget }}
-        {% endfor %}
-        self.setLayout(layout)
-        self.setWindowTitle('Generated GUI')
+    def initUI(self):
+        self.setWindowTitle("Command Executor")
+        self.setGeometry(100, 100, 300, 100)
 
-def execute_actions():
-    {% for action in execute_actions %}
-    {{ action }}
-    {% endfor %}
+        self.button = QtWidgets.QPushButton("Run Command", self)
+        self.button.clicked.connect(self.run_command)
+        self.button.resize(self.button.sizeHint())
+        self.button.move(100, 50)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    gui = GeneratedGUI()
-    gui.show()
+    def run_command(self):
+        command = "{{ command }}"
+        try:
+            subprocess.run(["powershell", "-Command", command], check=True)
+        except subprocess.CalledProcessError as e:
+            print("Error executing command:", e)
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    ex = CommandGuiApp()
+    ex.show()
     sys.exit(app.exec_())
