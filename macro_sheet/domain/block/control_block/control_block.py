@@ -27,16 +27,3 @@ class ControlBlock(Block):
     def __post_init__(self):
         super().__post_init__()
         self.block_type = BlockType.BASE_CONTROL_BLOCK
-
-
-# control block dict예시
-#         {
-#             "id": "ihbqjunwddqwihjdw"
-#             "block_type": "BASE_CONTROL_BLOCK",
-#             "control_type": "while",
-#             "condition": {
-#                 "type": "file_size_gt",
-#                 "value": 1024
-#             },
-#             "body": []
-#         }

@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class FolderConditionType(StrEnum):
+class FileFolderActionType(StrEnum):
     FOLDER_NAME_STARTSWITH = "FOLDER_NAME_STARTSWITH"  # 폴더 이름 시작
     FOLDER_NAME_ENDSWITH = "FOLDER_NAME_ENDSWITH"  # 폴더 이름 끝
     FOLDER_CONTAINS = "FOLDER_CONTAINS"  # 특정 파일이나 하위 폴더 포함

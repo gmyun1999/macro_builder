@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Tuple
 
+from macro_sheet.domain.block.action_block.action_block import ActionBlock
 from macro_sheet.domain.block.action_block.file_action_block import FileActionBlock
 from macro_sheet.domain.block.block import Block
+from macro_sheet.domain.block.condition_block.condition_block import ConditionBlock
 from macro_sheet.domain.block.condition_block.file_condition_block import (
     FileConditionBlock,
 )
@@ -21,22 +23,16 @@ class IGuiCodeGeneratorFromBlock(ABC):
         pass
 
     @abstractmethod
-    def piece_code_from_file_action(self, block: FileActionBlock) -> str:
-        """
-        file action 블록의 코드에 맞는 코드를 동적으로 생성해야함
-        """
+    def process_action_block(self, block: ActionBlock) -> str:
+        """ActionBlock의 서브 클래스를 확인하여 적절한 GUI 코드 생성 메소드 호출"""
         pass
 
     @abstractmethod
-    def piece_code_from_file_condition(self, block: FileConditionBlock) -> str:
-        """
-        file condition 블록의 코드에 맞는 코드를 동적으로 생성해야함
-        """
+    def process_condition_block(self, block: ConditionBlock) -> str:
+        """ConditionBlock의 서브 클래스를 확인하여 적절한 GUI 코드 생성 메소드 호출"""
         pass
 
     @abstractmethod
-    def piece_code_from_control(self, block: ControlBlock) -> Tuple[str, str]:
-        """
-        control 블록의 코드에 맞는 코드를 동적으로 생성해야함
-        """
+    def process_control_block(self, block: ControlBlock) -> str:
+        """ControlBlock의 코드를 생성하고 body와 conditions를 재귀적으로 처리"""
         pass

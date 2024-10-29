@@ -1,8 +1,8 @@
-# File Condition: {{ block.condition_type }}
-def check_{{ block.condition_type.lower() }}():
-    value = "{{ block.value }}"
-    detail_condition_types = {{ block.detail_condition_type | tojson }}
-    # 조건을 확인하는 로직을 여기에 추가
-    print("조건 확인: ", "{{ block.condition_type }}", "값: ", value)
-    # 실제 로직을 구현해야 합니다.
-    return True  # 예시로 항상 True 반환
+{# file_condition.py.j2 #}
+{% if detail_condition_type[0] == "FILE_SIZE_GT" %}
+filename.size > {{ value }}
+{% elif detail_condition_type[0] == "FILE_NAME_STARTSWITH" %}
+filename.startswith("{{ value }}")
+{% elif detail_condition_type[0] == "FILE_NAME_ENDSWITH" %}
+filename.endswith("{{ value }}")
+{% endif %}
