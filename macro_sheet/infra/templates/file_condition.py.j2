@@ -1,8 +1,0 @@
-{# file_condition.py.j2 #}
-{% if detail_condition_type[0] == "FILE_SIZE_GT" %}
-filename.size > {{ value }}
-{% elif detail_condition_type[0] == "FILE_NAME_STARTSWITH" %}
-filename.startswith("{{ value }}")
-{% elif detail_condition_type[0] == "FILE_NAME_ENDSWITH" %}
-filename.endswith("{{ value }}")
-{% endif %}

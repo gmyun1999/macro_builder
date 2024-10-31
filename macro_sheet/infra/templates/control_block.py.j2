@@ -1,8 +1,0 @@
-{# control_block.py.j2 #}
-{% if block.control_type == "IF" %}
-if ({{ condition }}):
-    {{ body | indent(4) }}
-{% elif block.control_type == "WHILE" %}
-while ({{ condition }}):
-    {{ body | indent(4) }}
-{% endif %}

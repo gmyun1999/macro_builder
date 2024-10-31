@@ -1,9 +1,0 @@
-# File Action: {{ action.name }}
-target_loc = "{{ target_loc }}"
-target_detail = "{{ target_detail }}"
-
-{% if action == "MOVE" or action == "COPY" %}
-destination = "{{ destination }}"
-{% endif %}
-
-print("{{ action.name }} 작업:", target_loc, "에서", {% if action != "DELETE" %}destination{% endif %}, "로 이동")

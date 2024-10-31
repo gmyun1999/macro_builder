@@ -10,5 +10,5 @@ class MacroSheetConfig(AppConfig):
         from macro_sheet.domain.block.condition_block.condition_block import (
             ConditionBlock,
         )
-        from macro_sheet.domain.block.control_block.control_block import ControlBlock
         from macro_sheet.domain.block.file_system_block import file_system_block
+        from macro_sheet.domain.block.loop_block.loop_block import LoopBlock

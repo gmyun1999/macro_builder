@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
 
 
-class IGuiCodeGeneratorFromBlock(ABC):
+class ITemplateRender(ABC):
     pass
