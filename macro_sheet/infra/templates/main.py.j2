@@ -1,28 +1,113 @@
-# main.py.jinja
 from PyQt5 import QtWidgets
 import sys
 import subprocess
+import os
+import signal
+import threading
 
 class CommandGuiApp(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.process = None  # 현재 실행 중인 프로세스를 추적
         self.initUI()
 
     def initUI(self):
         self.setWindowTitle("Command Executor")
-        self.setGeometry(100, 100, 300, 100)
+        self.setGeometry(100, 100, 400, 200)
 
-        self.button = QtWidgets.QPushButton("Run Command", self)
-        self.button.clicked.connect(self.run_command)
-        self.button.resize(self.button.sizeHint())
-        self.button.move(100, 50)
+        # 시작 버튼
+        self.start_button = QtWidgets.QPushButton("Run Script", self)
+        self.start_button.clicked.connect(self.run_script)
+        self.start_button.resize(self.start_button.sizeHint())
+        self.start_button.move(50, 50)
 
-    def run_command(self):
-        command = "{{ command }}"
+        # 중지 버튼
+        self.stop_button = QtWidgets.QPushButton("Stop Script", self)
+        self.stop_button.clicked.connect(self.stop_script)
+        self.stop_button.resize(self.stop_button.sizeHint())
+        self.stop_button.move(250, 50)
+        self.stop_button.setEnabled(False)  # 실행 중이 아닐 때는 비활성화
+
+    def run_script(self):
         try:
-            subprocess.run(["powershell", "-Command", command], check=True)
-        except subprocess.CalledProcessError as e:
-            print("Error executing command:", e)
+            # 스크립트 실행 버튼 활성화 / 비활성화 설정
+            self.start_button.setEnabled(False)
+            self.stop_button.setEnabled(True)
+            # 스크립트를 별도의 스레드에서 실행
+            threading.Thread(target=self.execute_script).start()
+        except PermissionError:
+            self.display_permission_error("Permission Denied. Do you want to retry with administrator rights?")
+        except Exception as e:
+            self.display_error(f"Error executing script: {str(e)}")
+
+    def execute_script(self):
+        try:
+            # 1. Python 코드가 필요하다면 여기서 직접 실행
+            python_code = {{python_script}}
+
+            # Python 코드를 직접 실행
+            with open("temp_script.py", "w") as script_file:
+                script_file.write(python_code)
+
+            # temp_script.py를 Python으로 실행
+            self.process = subprocess.Popen(
+                ["python", "temp_script.py"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+
+            stdout, stderr = self.process.communicate()
+            if stderr:
+                self.display_error(f"Script Error: {stderr}")
+            else:
+                self.display_message(f"Script Output: {stdout}")
+
+        except Exception as e:
+            self.display_error(f"Failed to execute script: {str(e)}")
+        finally:
+            # 프로세스 종료 후 버튼 상태 초기화
+            self.start_button.setEnabled(True)
+            self.stop_button.setEnabled(False)
+            self.process = None
+
+    def stop_script(self):
+        if self.process:
+            self.process.terminate()
+            self.process = None
+            self.display_message("Script stopped by user.")
+            # 버튼 상태 초기화
+            self.start_button.setEnabled(True)
+            self.stop_button.setEnabled(False)
+
+    def display_error(self, message):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.setIcon(QtWidgets.QMessageBox.Critical)
+        error_dialog.setText("An error occurred")
+        error_dialog.setInformativeText(message)
+        error_dialog.setWindowTitle("Error")
+        error_dialog.exec_()
+
+    def display_message(self, message):
+        message_dialog = QtWidgets.QMessageBox(self)
+        message_dialog.setIcon(QtWidgets.QMessageBox.Information)
+        message_dialog.setText("Information")
+        message_dialog.setInformativeText(message)
+        message_dialog.setWindowTitle("Info")
+        message_dialog.exec_()
+
+    def display_permission_error(self, message):
+        reply = QtWidgets.QMessageBox.question(self, "Permission Error", message,
+                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.Yes:
+            self.retry_as_admin()
+
+    def retry_as_admin(self):
+        try:
+            script_path = os.path.abspath(__file__)
+            subprocess.run(["powershell", "Start-Process", "python", f"-ArgumentList {script_path}", "-Verb", "runAs"])
+        except Exception as e:
+            self.display_error(f"Failed to restart as administrator: {str(e)}")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

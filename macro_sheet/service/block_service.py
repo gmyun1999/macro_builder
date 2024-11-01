@@ -1,3 +1,5 @@
+import httpx
+
 from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileConditionDetail,
     FileSystemAction,
@@ -133,6 +135,7 @@ class BlockService:
         """
         self.generated_functions = {}
         commands = []
+
         for block in worksheet.blocks:
             if isinstance(block, FileSystemBlock):
                 cmd = self.convert_file_system_block_to_str_code(block)
@@ -145,18 +148,43 @@ class BlockService:
                 commands.append(cmd)
             else:
                 raise TypeError(f"Unsupported block type: {type(block).__name__}")
+
         # Combine all generated functions and main code
         functions_code = "\n\n".join(self.generated_functions.values())
         main_code = "\n".join(commands)
-        # Indent the main_code by 4 spaces
-        indented_main_code = "\n".join(
-            ["    " + line for line in main_code.split("\n")]
-        )
-        full_script = (
-            "import subprocess\n"
-            + f"{functions_code}\n\nif __name__ == '__main__':\n{indented_main_code}"
-        )
+
+        full_script = "import subprocess\n" f"{functions_code}\n\n{main_code}"
+
         return full_script
+
+    def convert_file_from_script(self, script_str: str):
+        # Python 파일로 저장
+        script_path = "generated_execute_script.py"  # 로컬 경로에 파일 저장
+        with open(script_path, "w", encoding="utf-8") as script_file:
+            script_file.write(script_str)
+
+        return script_path
+
+    def send_to_package_server(self, script_path: str):
+        # 동기 클라이언트를 사용하여 패키징 서버로 파일 전송
+        url = "http://localhost:8000/package"  # 패키징 서버 URL
+        with open(script_path, "rb") as f:
+            files = {"file": (script_path, f)}
+            response = httpx.post(url, files=files, timeout=120.0)
+
+        # 응답 처리
+        if response.status_code == 200:
+            download_link = response.json().get("download_link")
+            return download_link
+        else:
+            return None
+
+    def generate_and_package_gui(self, execute_str_python_code: str):
+        # 1. Python 코드 파일 생성
+        script_path = self.generate_gui_str_code(execute_str_python_code)
+
+        # 2. 생성된 파일을 패키징 서버로 전송
+        download_link = self.send_to_package_server(script_path)
 
 
 class PowerShellConverter:
