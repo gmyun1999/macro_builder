@@ -11,8 +11,8 @@ from macro_sheet.domain.block.loop_block.loop_block import LoopBlock
 from macro_sheet.domain.block.reference_block import ReferenceBlock
 from macro_sheet.domain.Function.block_function import BlockFunction
 from macro_sheet.domain.worksheet.worksheet import Worksheet
-from macro_sheet.service.block_service import BlockService
 from macro_sheet.service.gui_service import GuiService
+from macro_sheet.service.service.block_service import BlockService
 
 
 class Command(BaseCommand):
@@ -36,7 +36,7 @@ class Command(BaseCommand):
                             block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.DELETE,
-                            loc="/C/user/temp/",
+                            loc=r"C:\Users\gmyun\OneDrive\바탕 화면\윤규민\test1",
                             condition=[{FileConditionDetail.FILE_SIZE_GT: "1000"}],
                             destination=None,
                             rename=None,
@@ -99,10 +99,10 @@ class Command(BaseCommand):
 
         # Prepare the Worksheet with complex blocks
         worksheet = Worksheet(
-            worksheet_id="ws1",
+            id="ws1",
             name="TestWorksheet",
             owner_id="user1",
-            blocks=[
+            main_blocks=[
                 LoopBlock(
                     block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
@@ -151,8 +151,25 @@ class Command(BaseCommand):
             ],
         )
 
+        worksheet1 = Worksheet(
+            id="ws1",
+            name="TestWorksheet",
+            owner_id="user1",
+            main_blocks=[
+                FileSystemBlock(
+                    block_type=BlockType.FILE_SYSTEM_BLOCK,
+                    target=FileSystemType.FILE,
+                    action=FileSystemAction.DELETE,
+                    loc="C:\\Users\\gmyun\\OneDrive\\바탕 화면\\윤규민\\test1",
+                    condition=[{FileConditionDetail.FILE_EXTENSION: "txt"}],
+                    destination=None,
+                    rename=None,
+                )
+            ],
+        )
+
         script_code = block_service.generate_script_from_worksheet(
-            block_functions=block_functions, worksheet=worksheet
+            block_functions=block_functions, worksheet=worksheet1
         )
         script_path = block_service.convert_file_from_script(script_str=script_code)
 

@@ -10,21 +10,15 @@ from macro_sheet.domain.block.loop_block.loop_block import LoopBlock
 from macro_sheet.domain.block.reference_block import ReferenceBlock
 from macro_sheet.domain.Function.block_function import BlockFunction
 from macro_sheet.domain.worksheet.worksheet import Worksheet
-from macro_sheet.infra.template_render.jinja2_template_render import (
-    Jinja2TemplateRender,
-)
-from macro_sheet.service.i_template_render.i_template_render import ITemplateRender
 
 
 class BlockService:
     def __init__(self):
-        # TODO: DI (Dependency Injection)
-        self.template_render: ITemplateRender = Jinja2TemplateRender()
         self.powershell_converter = PowerShellConverter()
         self.generated_functions = {}
 
     def convert_file_system_block_to_str_code(
-        self, block: FileSystemBlock, indent=0
+        self, block: FileSystemBlock, indent=0, encoding="utf-8"
     ) -> str:
         """
         Converts a FileSystemBlock to an executable PowerShell command string,
@@ -32,11 +26,17 @@ class BlockService:
         """
         indent_str = " " * indent
         # Use the PowerShellConverter to generate the command
-        powershell_command = self.powershell_converter.convert_fileblock_to_powershell(
-            block
+        original_powershell_command = (
+            self.powershell_converter.convert_fileblock_to_powershell(block)
         )
-        # Create the subprocess command string with proper indentation
-        subprocess_command = f"{indent_str}subprocess.run(['powershell', '-Command', \"{powershell_command}\"])"  # noqa: E501
+        # Prepend 'chcp 65001;' to set the code page to UTF-8
+        powershell_command = f"chcp 65001; {original_powershell_command}"
+
+        # Create the subprocess command string with proper indentation and encoding
+        subprocess_command = (
+            f"{indent_str}subprocess.run(['powershell', '-Command', r\"{powershell_command}\"], "
+            f"encoding='{encoding}', errors='ignore', check=True)"
+        )  # noqa: E501
         return subprocess_command
 
     def convert_loop_block_to_str_code(
@@ -47,8 +47,7 @@ class BlockService:
         visited=None,
     ) -> str:
         """
-        Converts a LoopBlock to an executable Python loop with nested commands.
-        """
+        Converts a LoopBlock to an executable Python loop with nested commands."""
         indent_str = " " * indent
         commands = []
         iter_cnt = block.iter_cnt
@@ -136,7 +135,7 @@ class BlockService:
         self.generated_functions = {}
         commands = []
 
-        for block in worksheet.blocks:
+        for block in worksheet.main_blocks:
             if isinstance(block, FileSystemBlock):
                 cmd = self.convert_file_system_block_to_str_code(block)
                 commands.append(cmd)
@@ -178,13 +177,6 @@ class BlockService:
             return download_link
         else:
             return None
-
-    def generate_and_package_gui(self, execute_str_python_code: str):
-        # 1. Python 코드 파일 생성
-        script_path = self.generate_gui_str_code(execute_str_python_code)
-
-        # 2. 생성된 파일을 패키징 서버로 전송
-        download_link = self.send_to_package_server(script_path)
 
 
 class PowerShellConverter:

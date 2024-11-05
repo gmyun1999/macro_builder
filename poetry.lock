@@ -146,6 +146,17 @@ asgiref = ">=3.6"
 django = ">=4.2"
 
 [[package]]
+name = "django-cte"
+version = "1.3.3"
+description = "Common Table Expressions (CTE) for Django"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-cte-1.3.3.tar.gz", hash = "sha256:0c1aeef067278a22886151c1d27f6f665a303952d058900e5ca82a24cde40697"},
+    {file = "django_cte-1.3.3-py2.py3-none-any.whl", hash = "sha256:85bbc3efb30c2f8c9ae3080ca6f0b9570e43d2cb4b6be10846c8ef9f046873fa"},
+]
+
+[[package]]
 name = "django-dotenv"
 version = "1.4.2"
 description = "foreman reads from .env. manage.py doesn't. Let's fix that."
@@ -815,4 +826,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a6a7284e93601b1fa0e14d69a6f49d7fd8f7752fdfce1c5c9133ab036d7243c5"
+content-hash = "bef1e01cd5bb0de175dfaa13845b8b62104fa292d417fa7c0b1494d54c2314ef"

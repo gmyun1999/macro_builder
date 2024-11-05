@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -35,7 +36,7 @@ class FileConditionDetail(StrEnum):
 
 
 @register_block_type(BlockType.FILE_SYSTEM_BLOCK)
-@dataclass
+@dataclass(kw_only=True)
 class FileSystemBlock(Block):
     target: FileSystemType
     action: FileSystemAction
@@ -49,7 +50,31 @@ class FileSystemBlock(Block):
         self.block_type = BlockType.FILE_SYSTEM_BLOCK
 
     def validate(self) -> bool:
-        # Action-specific validation remains the same...
+        safe_path_pattern = re.compile(r"^[\w\s\-\\:]+$")
+
+        # Validate and sanitize 'loc'
+        if self.loc:
+            # Convert single '\' to '\\'
+            if "\\" in self.loc and "\\" not in self.loc.replace("\\\\", ""):
+                self.loc = self.loc.replace("\\", "\\\\")
+            # Check for malicious characters
+            if not safe_path_pattern.match(self.loc):
+                raise ValueError(
+                    "The 'loc' path contains potentially unsafe characters."
+                )
+
+        # Validate and sanitize 'destination'
+        if self.destination:
+            # Convert single '\' to '\\'
+            if "\\" in self.destination and "\\" not in self.destination.replace(
+                "\\\\", ""
+            ):
+                self.destination = self.destination.replace("\\", "\\\\")
+            # Check for malicious characters
+            if not safe_path_pattern.match(self.destination):
+                raise ValueError(
+                    "The 'destination' path contains potentially unsafe characters."
+                )
 
         # Validate conditions
         for condition in self.condition:
@@ -94,4 +119,5 @@ class FileSystemBlock(Block):
                     raise ValueError(
                         "Target 'FILE' cannot have folder-related conditions."
                     )
+
         return True

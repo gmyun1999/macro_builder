@@ -4,7 +4,7 @@ from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileConditionDetail,
     FileSystemBlock,
 )
-from macro_sheet.service.block_service import BlockService, PowerShellConverter
+from macro_sheet.service.service.block_service import BlockService, PowerShellConverter
 
 
 class Command(BaseCommand):

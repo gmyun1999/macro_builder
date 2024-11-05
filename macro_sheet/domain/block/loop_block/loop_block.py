@@ -1,11 +1,11 @@
-from dataclasses import dataclass, field
+from dataclasses import KW_ONLY, dataclass, field
 
 from macro_sheet.domain.block.block import Block, BlockType
 from macro_sheet.domain.registry import register_block_type
 
 
 @register_block_type(BlockType.BASE_LOOP_BLOCK)
-@dataclass
+@dataclass(kw_only=True)
 class LoopBlock(Block):
     """
     LoopBlock은 base loop block이다. 단순히 몇번 반복할지만 정의한다.

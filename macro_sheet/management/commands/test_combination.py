@@ -11,8 +11,7 @@ from macro_sheet.domain.block.loop_block.loop_block import LoopBlock
 from macro_sheet.domain.block.reference_block import ReferenceBlock
 from macro_sheet.domain.Function.block_function import BlockFunction
 from macro_sheet.domain.worksheet.worksheet import Worksheet
-from macro_sheet.service.block_service import BlockService
-from macro_sheet.service.worksheet_service import WorksheetService
+from macro_sheet.service.service.block_service import BlockService
 
 
 class Command(BaseCommand):
@@ -99,10 +98,10 @@ class Command(BaseCommand):
 
         # Prepare the Worksheet with complex blocks
         worksheet = Worksheet(
-            worksheet_id="ws1",
+            id="ws1",
             name="TestWorksheet",
             owner_id="user1",
-            blocks=[
+            main_blocks=[
                 LoopBlock(
                     block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
