@@ -136,9 +136,14 @@ WSGI_APPLICATION = "macro_be.wsgi.application"
 
 # Database
 
+MIGRATION_MODULES = {
+    "macro_sheet": "macro_sheet.infra.migrations",
+}
+
 pymysql.install_as_MySQLdb()
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
 
 if ENV == "localhost":
     DATABASES = {

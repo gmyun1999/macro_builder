@@ -7,6 +7,7 @@ class MacroSheetConfig(AppConfig):
 
     def ready(self):
         # 도메인 클래스를 임포트하여 레지스트리에 등록되도록 함
+        import macro_sheet.infra.models
         from macro_sheet.domain.block.condition_block.condition_block import (
             ConditionBlock,
         )
