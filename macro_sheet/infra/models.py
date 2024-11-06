@@ -17,6 +17,9 @@ class Function(models.Model):
     name = models.CharField(max_length=255)
     blocks = models.JSONField(default=list)
 
+    class Meta:
+        db_table = "Function"
+
 
 class Worksheet(models.Model):
     """
@@ -36,6 +39,9 @@ class Worksheet(models.Model):
     main_blocks = models.JSONField(default=list)
     blocks = models.JSONField(default=list)
 
+    class Meta:
+        db_table = "Worksheet"
+
 
 class WorksheetFunction(models.Model):
     """
@@ -50,6 +56,7 @@ class WorksheetFunction(models.Model):
     )
 
     class Meta:
+        db_table = "WorksheetFunction"
         unique_together = ("worksheet", "function")
         indexes = [
             models.Index(fields=["worksheet"]),
@@ -70,8 +77,34 @@ class FunctionHierarchy(models.Model):
     )
 
     class Meta:
+        db_table = "FunctionHierarchy"
         unique_together = ("parent", "child")
         indexes = [
             models.Index(fields=["parent"]),
             models.Index(fields=["child"]),
         ]
+
+
+class Gui(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    owner = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="gui_owner",
+        db_constraint=False,
+    )
+    worksheet = models.ForeignKey(
+        Worksheet,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="gui_worksheets",
+        db_constraint=False,
+    )
+    url = models.URLField(max_length=500)
+
+    class Meta:
+        db_table = "Gui"

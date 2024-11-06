@@ -5,7 +5,9 @@ from macro_sheet.service.i_repo.i_worksheet_repo import IWorksheetRepo
 
 
 class WorksheetRepo(IWorksheetRepo):
-    def fetch_worksheet(self, filter: IWorksheetRepo.Filter) -> list[WorksheetVo]:
+    def fetch_worksheet(
+        self, filter: IWorksheetRepo.Filter
+    ) -> list[IWorksheetRepo.WorksheetDTO | None]:
         """filter 조건에 맞는 worksheet 가져오기"""
         queryset = Worksheet.objects.all()
 
@@ -15,7 +17,7 @@ class WorksheetRepo(IWorksheetRepo):
             queryset = queryset.filter(owner_id=filter.owner_id)
 
         return [
-            WorksheetVo(
+            self.WorksheetDTO(
                 id=worksheet.id,
                 name=worksheet.name,
                 owner_id=worksheet.owner_id,
@@ -25,9 +27,12 @@ class WorksheetRepo(IWorksheetRepo):
             for worksheet in queryset
         ]
 
-    def create_worksheet(self, worksheet_obj: WorksheetVo) -> WorksheetVo:
+    def create_worksheet(
+        self, worksheet_obj: WorksheetVo
+    ) -> IWorksheetRepo.WorksheetDTO:
         """worksheet 생성"""
 
+        # TODO : 바로 밀어넣는게아니라, main_blocks랑 blocks는 다시 list[dict]로 변환한다음에 넣어줘야함
         worksheet = Worksheet(
             id=worksheet_obj.id,
             name=worksheet_obj.name,
@@ -37,7 +42,7 @@ class WorksheetRepo(IWorksheetRepo):
         )
         worksheet.save()
 
-        return WorksheetVo(
+        return self.WorksheetDTO(
             id=worksheet.id,
             name=worksheet.name,
             owner_id=worksheet.owner_id,
@@ -45,17 +50,21 @@ class WorksheetRepo(IWorksheetRepo):
             blocks=worksheet.blocks,
         )
 
-    def update_worksheet(self, worksheet_obj: WorksheetVo) -> WorksheetVo:
+    def update_worksheet(
+        self, worksheet_obj: WorksheetVo
+    ) -> IWorksheetRepo.WorksheetDTO:
         """기존 worksheet 수정"""
+
+        # TODO : 바로 밀어넣는게아니라, main_blocks랑 blocks는 다시 list[dict]로 변환한다음에 넣어줘야함
         worksheet = Worksheet.objects.get(id=worksheet_obj.id)
 
         worksheet.name = worksheet_obj.name
         worksheet.owner_id = worksheet_obj.owner_id
-        worksheet.main_blocks = worksheet_obj.main_blocks
-        worksheet.blocks = worksheet_obj.blocks
+        worksheet.main_blocks = worksheet_obj.main_blocks  # 이부분 list[dict]로 변환
+        worksheet.blocks = worksheet_obj.blocks  # 이부분 list[dict]로 변환
         worksheet.save()
 
-        return WorksheetVo(
+        return self.WorksheetDTO(
             id=worksheet.id,
             name=worksheet.name,
             owner_id=worksheet.owner_id,
@@ -63,24 +72,7 @@ class WorksheetRepo(IWorksheetRepo):
             blocks=worksheet.blocks,
         )
 
-    def delete_worksheet(self, worksheet_obj: WorksheetVo) -> bool:
+    def delete_worksheet(self, worksheet_id: str) -> bool:
         """worksheet 삭제"""
-        deleted, _ = Worksheet.objects.filter(id=worksheet_obj.id).delete()
+        deleted, _ = Worksheet.objects.filter(id=worksheet_id).delete()
         return deleted > 0
-
-    def bulk_create_worksheets(
-        self, worksheets: list[WorksheetVo]
-    ) -> list[WorksheetVo]:
-        # WorksheetVo를 실제 Worksheet 모델 객체로 변환하여 일괄 생성
-        worksheet_objs = [
-            Worksheet(
-                id=worksheet_vo.id,
-                name=worksheet_vo.name,
-                owner_id=worksheet_vo.owner_id,
-                main_blocks=worksheet_vo.main_blocks,
-                blocks=worksheet_vo.blocks,
-            )
-            for worksheet_vo in worksheets
-        ]
-        Worksheet.objects.bulk_create(worksheet_objs)
-        return worksheets

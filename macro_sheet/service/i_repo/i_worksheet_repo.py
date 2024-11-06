@@ -9,37 +9,45 @@ class IWorksheetRepo(ABC):
             self.id = id
             self.owner_id = owner_id
 
+    class WorksheetDTO:
+        def __init__(
+            self,
+            id: str,
+            name: str,
+            owner_id: str | None,
+            main_blocks: list[dict | None],
+            blocks: list[dict | None],
+        ):
+            self.id = id
+            self.name = name
+            self.owner_id = owner_id
+            self.main_blocks = main_blocks
+            self.blocks = blocks
+
     @abstractmethod
-    def fetch_worksheet(self, filter: Filter) -> list[WorksheetVo]:
+    def fetch_worksheet(self, filter: Filter) -> list[WorksheetDTO | None]:
         """
         filter 조건에 맞는 worksheet 가져오기
         """
         pass
 
     @abstractmethod
-    def create_worksheet(self, Worksheet_obj: WorksheetVo) -> WorksheetVo:
+    def create_worksheet(self, Worksheet_obj: WorksheetVo) -> WorksheetDTO:
         """
         worksheet 생성
         """
         pass
 
     @abstractmethod
-    def update_worksheet(self, Worksheet_obj: WorksheetVo) -> WorksheetVo:
+    def update_worksheet(self, Worksheet_obj: WorksheetVo) -> WorksheetDTO:
         """
         기존 worksheet 수정
         """
         pass
 
     @abstractmethod
-    def delete_worksheet(self, Worksheet_obj: WorksheetVo) -> bool:
-        """
+    def delete_worksheet(self, worksheet_id: str) -> bool:
+        """s
         function 삭제
         """
-        pass
-
-    @abstractmethod
-    def bulk_create_worksheets(
-        self, worksheets: list[WorksheetVo]
-    ) -> list[WorksheetVo]:
-        """여러 Worksheet를 일괄 생성"""
         pass

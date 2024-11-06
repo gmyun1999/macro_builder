@@ -3,10 +3,15 @@ class BlockFunctionUseCase:
         pass
 
     def update_process(self):
+        """
+        기존의 블럭함수를 수정하는
+        """
         pass
 
     def create_process(self):
-        """ """
+        """
+        블럭함수를 새로 생성하는
+        """
         pass
 
     def delete_process(self):

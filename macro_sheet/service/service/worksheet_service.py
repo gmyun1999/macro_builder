@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.db import transaction
 
 from macro_sheet.domain.worksheet import Worksheet as WorksheetVo
@@ -17,7 +19,7 @@ class WorksheetService:
     @transaction.atomic
     def create_worksheet_with_WorksheetFunction(
         self, worksheet_vo: WorksheetVo, function_ids: list[str] | None = None
-    ) -> WorksheetVo:
+    ) -> IWorksheetRepo.WorksheetDTO:
         # Worksheet 생성
         created_worksheet = self.worksheet_repo.create_worksheet(worksheet_vo)
 
@@ -38,7 +40,7 @@ class WorksheetService:
     @transaction.atomic
     def update_worksheet(
         self, worksheet_vo: WorksheetVo, function_ids: list[str] | None = None
-    ) -> WorksheetVo:
+    ) -> IWorksheetRepo.WorksheetDTO:
         # 기존 Worksheet 업데이트
         updated_worksheet = self.worksheet_repo.update_worksheet(worksheet_vo)
 
@@ -62,19 +64,22 @@ class WorksheetService:
         return updated_worksheet
 
     @transaction.atomic
-    def delete_worksheet_with_WorksheetFunction(
-        self, worksheet_vo: WorksheetVo
-    ) -> bool:
+    def delete_worksheet_with_WorksheetFunction(self, worksheet_id: str) -> bool:
         # WorksheetFunction 데이터 삭제
         self.worksheet_function_repo.delete_worksheet_functions_by_worksheet_id(
-            worksheet_vo.id
+            worksheet_id=worksheet_id
         )
 
         # Worksheet 삭제
-        return self.worksheet_repo.delete_worksheet(worksheet_vo)
+        return self.worksheet_repo.delete_worksheet(worksheet_id)
 
-    def fetch_worksheet(self, worksheet_id: str) -> WorksheetVo | None:
-        filter_obj = IWorksheetRepo.Filter(id=worksheet_id)
+    def fetch_worksheet(
+        self, worksheet_id: str | None = None, owner_id: str | None = None
+    ) -> list[IWorksheetRepo.WorksheetDTO] | None:
+        filter_obj = IWorksheetRepo.Filter(id=worksheet_id, owner_id=owner_id)
 
         worksheets = self.worksheet_repo.fetch_worksheet(filter_obj)
-        return worksheets[0] if worksheets else None
+
+        return cast(
+            list[IWorksheetRepo.WorksheetDTO] | None, worksheets if worksheets else None
+        )  # mypy 떄문에 이렇게함
