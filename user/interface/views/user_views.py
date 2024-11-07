@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass
 
 import arrow
@@ -39,7 +40,7 @@ class OAuthLoginView(APIView):
             now = arrow.now().isoformat()
             user = self.user_service.create_user(
                 User(
-                    id=ULID().generate(),
+                    id=str(uuid.uuid4()),
                     name=oauth_user_vo.name,
                     email=oauth_user_vo.email,
                     mobile_no=oauth_user_vo.mobile_no,

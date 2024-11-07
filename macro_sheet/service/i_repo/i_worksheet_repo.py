@@ -15,17 +15,17 @@ class IWorksheetRepo(ABC):
             id: str,
             name: str,
             owner_id: str | None,
-            main_blocks: list[dict | None],
+            main_block: dict | None,
             blocks: list[dict | None],
         ):
             self.id = id
             self.name = name
             self.owner_id = owner_id
-            self.main_blocks = main_blocks
+            self.main_block = main_block
             self.blocks = blocks
 
     @abstractmethod
-    def fetch_worksheet(self, filter: Filter) -> list[WorksheetDTO | None]:
+    def fetch_worksheet(self, filter: Filter) -> list[WorksheetDTO]:
         """
         filter 조건에 맞는 worksheet 가져오기
         """

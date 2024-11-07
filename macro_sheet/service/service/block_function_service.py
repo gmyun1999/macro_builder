@@ -111,7 +111,21 @@ class BlockFunctionService:
         except Exception as e:
             raise ValueError(f"블록 함수 및 클로저 관계 삭제 중 오류가 발생했습니다: {str(e)}")
 
-    def get_ancestors(self, function_id: str) -> list[str | None]:
+    def fetch_function_by_id(self, function_id: str) -> BlockFunction | None:
+        result = self.blk_func_repo.fetch_function(
+            filter=self.blk_func_repo.Filter(id=function_id)
+        )
+        if not result:
+            return None
+
+        return result[0]
+
+    def fetch_function_by_owner_id(self, owner_id: str) -> list[BlockFunction]:
+        return self.blk_func_repo.fetch_function(
+            filter=self.blk_func_repo.Filter(owner_id=owner_id)
+        )
+
+    def get_ancestors(self, function_id: str) -> list[str]:
         """
         주어진 함수의 모든 부모 함수 ID를 조회합니다.
         """
@@ -121,3 +135,43 @@ class BlockFunctionService:
 
         except Exception as e:
             raise ValueError(f"부모 함수 조회 중 오류가 발생했습니다: {str(e)}")
+
+    def get_child_function_ids(self, function_id: str):
+        """
+        주어진 function_id의 자식 function들의 ids 를 반환한다. 없으면 None
+        """
+        closure_relation = self.func_closure_repo.fetch(
+            self.func_closure_repo.Filter(parent_id=function_id)
+        )
+        if closure_relation:
+            return [child.child_id for child in closure_relation]
+
+        return None
+
+    def check_circular(
+        self, target_function_id: str, related_function_ids: list[str]
+    ) -> bool:
+        """
+        function 끼리의 순환참조를 체크한다.
+        related_function_ids의 조상들중에서
+        function_id가 존재하는지 확인하면됨.
+        """
+        ancestors = set()
+        for related_func in related_function_ids:
+            related_ancestors = self.get_ancestors(function_id=related_func)
+            ancestors.update(related_ancestors)
+
+            if target_function_id in ancestors:
+                return True  # 순환 참조 발견
+
+        return False  # 순환 참조 없음
+
+    def check_is_exist_id(self, function_id: str) -> bool:
+        """
+        function_id가 존재하는지를 확인한다.
+        """
+        result = self.fetch_function_by_id(function_id=function_id)
+        if result is None:
+            return False
+
+        return True

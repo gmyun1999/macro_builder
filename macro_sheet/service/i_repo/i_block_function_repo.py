@@ -5,7 +5,7 @@ from macro_sheet.domain.Function.block_function import BlockFunction as BlockFun
 
 class IBlockFunctionRepo(ABC):
     class Filter:
-        def __init__(self, id, owner_id):
+        def __init__(self, id: str | None = None, owner_id: str | None = None):
             self.id = id
             self.owner_id = owner_id
 

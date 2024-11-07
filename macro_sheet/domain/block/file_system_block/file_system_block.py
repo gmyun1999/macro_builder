@@ -1,6 +1,7 @@
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import Any
 
 from macro_sheet.domain.block.block import Block, BlockType
 from macro_sheet.domain.registry import register_block_type
@@ -38,16 +39,69 @@ class FileConditionDetail(StrEnum):
 @register_block_type(BlockType.FILE_SYSTEM_BLOCK)
 @dataclass(kw_only=True)
 class FileSystemBlock(Block):
+    FIELD_TARGET = "target"
+    FIELD_ACTION = "action"
+    FIELD_LOC = "loc"
+    FIELD_CONDITION = "condition"
+    FIELD_DESTINATION = "destination"
+    FIELD_RENAME = "rename"
+
     target: FileSystemType
     action: FileSystemAction
     loc: str
     condition: list[dict[FileConditionDetail, str] | None]
     destination: str | None
     rename: str | None
+    block_type: BlockType = field(init=False)
 
     def __post_init__(self):
-        super().__post_init__()
         self.block_type = BlockType.FILE_SYSTEM_BLOCK
+
+    def to_dict(self) -> dict[str, Any]:
+        base_dict = super().to_dict()
+        serialized_conditions = [
+            {condition_detail.value: value} if condition is not None else None
+            for condition in self.condition
+            for condition_detail, value in (condition.items() if condition else [])
+        ]
+        base_dict.update(
+            {
+                self.FIELD_TARGET: self.target.value,
+                self.FIELD_ACTION: self.action.value,
+                self.FIELD_LOC: self.loc,
+                self.FIELD_CONDITION: serialized_conditions,
+                self.FIELD_DESTINATION: self.destination,
+                self.FIELD_RENAME: self.rename,
+            }
+        )
+        return base_dict
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "FileSystemBlock":
+        raw_conditions = data.get(cls.FIELD_CONDITION, [])
+        conditions: list[dict[FileConditionDetail, str] | None] = []
+        for cond in raw_conditions:
+            if cond is None:
+                conditions.append(None)
+            else:
+                condition_dict: dict[FileConditionDetail, str] = {}
+                for key, value in cond.items():
+                    try:
+                        condition_detail = FileConditionDetail(key)
+                        condition_dict[condition_detail] = value
+                    except ValueError:
+                        raise ValueError(f"Unrecognized FileConditionDetail: {key}")
+                conditions.append(condition_dict)
+
+        return cls(
+            target=FileSystemType(data[cls.FIELD_TARGET]),
+            action=FileSystemAction(data[cls.FIELD_ACTION]),
+            loc=data[cls.FIELD_LOC],
+            condition=conditions,
+            destination=data.get(cls.FIELD_DESTINATION),
+            rename=data.get(cls.FIELD_RENAME),
+            position=data.get(cls.FIELD_POSITION),
+        )
 
     def validate(self) -> bool:
         safe_path_pattern = re.compile(r"^[\w\s\-\\:]+$")

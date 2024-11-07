@@ -2,7 +2,7 @@ from typing import cast
 
 from django.db import transaction
 
-from macro_sheet.domain.worksheet import Worksheet as WorksheetVo
+from macro_sheet.domain.worksheet.worksheet import Worksheet as WorksheetVo
 from macro_sheet.infra.repo.worksheet_function_repo import WorksheetFunctionRepo
 from macro_sheet.infra.repo.worksheet_repo import WorksheetRepo
 from macro_sheet.service.i_repo.i_worksheet_function_repo import IWorksheetFunctionRepo
@@ -11,10 +11,9 @@ from macro_sheet.service.i_repo.i_worksheet_repo import IWorksheetRepo
 
 class WorksheetService:
     def __init__(self) -> None:
-        self.worksheet_repo: IWorksheetRepo = WorksheetRepo()  # 의존성 주입
-        self.worksheet_function_repo: IWorksheetFunctionRepo = (
-            WorksheetFunctionRepo()
-        )  # 의존성 주입
+        # TODO: DI
+        self.worksheet_repo: IWorksheetRepo = WorksheetRepo()
+        self.worksheet_function_repo: IWorksheetFunctionRepo = WorksheetFunctionRepo()
 
     @transaction.atomic
     def create_worksheet_with_WorksheetFunction(
@@ -80,6 +79,7 @@ class WorksheetService:
 
         worksheets = self.worksheet_repo.fetch_worksheet(filter_obj)
 
-        return cast(
-            list[IWorksheetRepo.WorksheetDTO] | None, worksheets if worksheets else None
-        )  # mypy 떄문에 이렇게함
+        if worksheets:
+            return worksheets
+
+        return None

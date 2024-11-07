@@ -1,3 +1,4 @@
+from macro_sheet.domain.block.base_block.main_block import MainBlock
 from macro_sheet.domain.worksheet.worksheet import Worksheet as WorksheetVo
 from macro_sheet.infra.models import Worksheet
 from macro_sheet.service.i_repo.i_block_function_repo import IBlockFunctionRepo
@@ -7,7 +8,7 @@ from macro_sheet.service.i_repo.i_worksheet_repo import IWorksheetRepo
 class WorksheetRepo(IWorksheetRepo):
     def fetch_worksheet(
         self, filter: IWorksheetRepo.Filter
-    ) -> list[IWorksheetRepo.WorksheetDTO | None]:
+    ) -> list[IWorksheetRepo.WorksheetDTO]:
         """filter 조건에 맞는 worksheet 가져오기"""
         queryset = Worksheet.objects.all()
 
@@ -21,7 +22,7 @@ class WorksheetRepo(IWorksheetRepo):
                 id=worksheet.id,
                 name=worksheet.name,
                 owner_id=worksheet.owner_id,
-                main_blocks=worksheet.main_blocks,
+                main_block=worksheet.main_block,
                 blocks=worksheet.blocks,
             )
             for worksheet in queryset
@@ -32,13 +33,20 @@ class WorksheetRepo(IWorksheetRepo):
     ) -> IWorksheetRepo.WorksheetDTO:
         """worksheet 생성"""
 
-        # TODO : 바로 밀어넣는게아니라, main_blocks랑 blocks는 다시 list[dict]로 변환한다음에 넣어줘야함
+        main_block: MainBlock | None = worksheet_obj.main_block
+        blocks = [block.to_dict() if block else None for block in worksheet_obj.blocks]
+
+        if main_block is None:
+            dicted_main_block = None
+        else:
+            dicted_main_block = main_block.to_dict()
+
         worksheet = Worksheet(
             id=worksheet_obj.id,
             name=worksheet_obj.name,
             owner_id=worksheet_obj.owner_id,
-            main_blocks=worksheet_obj.main_blocks,
-            blocks=worksheet_obj.blocks,
+            main_block=dicted_main_block,
+            blocks=blocks,
         )
         worksheet.save()
 
@@ -46,8 +54,8 @@ class WorksheetRepo(IWorksheetRepo):
             id=worksheet.id,
             name=worksheet.name,
             owner_id=worksheet.owner_id,
-            main_blocks=worksheet.main_blocks,
-            blocks=worksheet.blocks,
+            main_block=dicted_main_block,
+            blocks=blocks,
         )
 
     def update_worksheet(
@@ -55,20 +63,28 @@ class WorksheetRepo(IWorksheetRepo):
     ) -> IWorksheetRepo.WorksheetDTO:
         """기존 worksheet 수정"""
 
-        # TODO : 바로 밀어넣는게아니라, main_blocks랑 blocks는 다시 list[dict]로 변환한다음에 넣어줘야함
         worksheet = Worksheet.objects.get(id=worksheet_obj.id)
+
+        main_block: MainBlock | None = worksheet_obj.main_block
+
+        if main_block is None:
+            dicted_main_block = None
+        else:
+            dicted_main_block = main_block.to_dict()
+
+        blocks = [block.to_dict() if block else None for block in worksheet_obj.blocks]
 
         worksheet.name = worksheet_obj.name
         worksheet.owner_id = worksheet_obj.owner_id
-        worksheet.main_blocks = worksheet_obj.main_blocks  # 이부분 list[dict]로 변환
-        worksheet.blocks = worksheet_obj.blocks  # 이부분 list[dict]로 변환
+        worksheet.main_block = dicted_main_block  # 이부분 dict | None 로 변환
+        worksheet.blocks = blocks  # 이부분 list[dict]로 변환
         worksheet.save()
 
         return self.WorksheetDTO(
             id=worksheet.id,
             name=worksheet.name,
             owner_id=worksheet.owner_id,
-            main_blocks=worksheet.main_blocks,
+            main_block=worksheet.main_block,
             blocks=worksheet.blocks,
         )
 

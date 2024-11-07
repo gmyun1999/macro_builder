@@ -30,6 +30,7 @@ class FunctionClosureRepo(IFunctionClosureRepo):
     def fetch(
         self, filter: IFunctionClosureRepo.Filter
     ) -> list[IFunctionClosureRepo.Closure]:
+        """ """
         queryset = FunctionHierarchy.objects.all()
         if filter.parent_id is not None:
             queryset = queryset.filter(parent_id=filter.parent_id)
@@ -72,7 +73,7 @@ class FunctionClosureRepo(IFunctionClosureRepo):
             if deleted_count != len(closures):
                 raise ValueError("일부 FunctionClosure 관계가 존재하지 않거나 삭제되지 않았습니다.")
 
-    def get_all_ancestors(self, root_function_id: str) -> list[str | None]:
+    def get_all_ancestors(self, root_function_id: str) -> list[str]:
         """주어진 함수의 모든 상위 함수 ID를 조회합니다."""
         # 초기 CTE 정의 - root_function_id를 기준으로 직접 부모들 찾기
         ancestors_cte = With(

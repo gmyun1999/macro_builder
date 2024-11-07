@@ -42,5 +42,5 @@ class IFunctionClosureRepo(ABC):
         pass
 
     @abstractmethod
-    def get_all_ancestors(self, root_function_id: str) -> list[str | None]:
+    def get_all_ancestors(self, root_function_id: str) -> list[str]:
         pass

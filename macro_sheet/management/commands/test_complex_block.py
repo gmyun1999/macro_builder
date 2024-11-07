@@ -1,5 +1,8 @@
 from django.core.management.base import BaseCommand
 
+from macro_sheet.domain.block.base_block.loop_block import LoopBlock
+from macro_sheet.domain.block.base_block.main_block import MainBlock
+from macro_sheet.domain.block.base_block.reference_block import ReferenceBlock
 from macro_sheet.domain.block.block import BlockType
 from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileConditionDetail,
@@ -7,8 +10,6 @@ from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileSystemBlock,
     FileSystemType,
 )
-from macro_sheet.domain.block.loop_block.loop_block import LoopBlock
-from macro_sheet.domain.block.reference_block import ReferenceBlock
 from macro_sheet.domain.Function.block_function import BlockFunction
 from macro_sheet.domain.worksheet.worksheet import Worksheet
 from macro_sheet.service.service.block_service import BlockService
@@ -28,11 +29,9 @@ class Command(BaseCommand):
             name="NestedFunction1",
             blocks=[
                 LoopBlock(
-                    block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
                     body=[
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.DELETE,
                             loc="/C/user/temp/",
@@ -41,7 +40,6 @@ class Command(BaseCommand):
                             rename=None,
                         ),
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.PRINT,
                             loc="/C/user/images/",
@@ -60,7 +58,6 @@ class Command(BaseCommand):
             name="NestedFunction2",
             blocks=[
                 FileSystemBlock(
-                    block_type=BlockType.FILE_SYSTEM_BLOCK,
                     target=FileSystemType.FILE,
                     action=FileSystemAction.COMPRESS,
                     loc="/C/user/logs/",
@@ -77,11 +74,9 @@ class Command(BaseCommand):
             name="NestedFunction3",
             blocks=[
                 LoopBlock(
-                    block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
                     body=[
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.DELETE,
                             loc="/C/user/temp/",
@@ -97,18 +92,13 @@ class Command(BaseCommand):
         block_functions = [nested_function_1, nested_function_2, nested_function_3]
 
         # Prepare the Worksheet with complex blocks
-        worksheet = Worksheet(
-            id="ws1",
-            name="TestWorksheet",
-            owner_id="user1",
-            main_blocks=[
+        main_block2 = MainBlock(
+            body=[
                 LoopBlock(
-                    block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
                     body=[
                         # First FileSystemBlock in the outer loop
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.COPY,
                             loc="/C/user/documents/",
@@ -118,17 +108,14 @@ class Command(BaseCommand):
                         ),
                         # Nested LoopBlock inside the main LoopBlock
                         LoopBlock(
-                            block_type=BlockType.BASE_LOOP_BLOCK,
                             iter_cnt="3",
                             body=[
                                 # Reference to nested_function_1 containing its own nested loop
                                 ReferenceBlock(
-                                    block_type=BlockType.REFERENCE_BLOCK,
                                     reference_id="func_nested_1",
                                 ),
                                 # Another FileSystemBlock in this inner loop
                                 FileSystemBlock(
-                                    block_type=BlockType.FILE_SYSTEM_BLOCK,
                                     target=FileSystemType.FILE,
                                     action=FileSystemAction.MOVE,
                                     loc="/C/user/downloads/",
@@ -142,12 +129,14 @@ class Command(BaseCommand):
                         ),
                         # Reference to another function at the end of the main loop
                         ReferenceBlock(
-                            block_type=BlockType.REFERENCE_BLOCK,
                             reference_id="func_nested_2",
                         ),
                     ],
                 )
-            ],
+            ]
+        )
+        worksheet = Worksheet(
+            id="ws1", name="TestWorksheet", owner_id="user1", main_block=main_block2
         )
 
         # Define additional BlockFunctions for complex tests
@@ -161,7 +150,6 @@ class Command(BaseCommand):
                 "name": "Test 1: FileSystemBlock COPY action",
                 "command": service.convert_file_system_block_to_str_code(
                     fs_block_1 := FileSystemBlock(
-                        block_type=BlockType.FILE_SYSTEM_BLOCK,
                         target=FileSystemType.FILE,
                         action=FileSystemAction.COPY,
                         loc="/C/user/documents/",
@@ -176,7 +164,6 @@ class Command(BaseCommand):
                 "name": "Test 2: FileSystemBlock RENAME action",
                 "command": service.convert_file_system_block_to_str_code(
                     fs_block_2 := FileSystemBlock(
-                        block_type=BlockType.FILE_SYSTEM_BLOCK,
                         target=FileSystemType.FOLDER,
                         action=FileSystemAction.RENAME,
                         loc="/C/user/projects/",
@@ -191,7 +178,6 @@ class Command(BaseCommand):
                 "name": "Test 3: FileSystemBlock DELETE action",
                 "command": service.convert_file_system_block_to_str_code(
                     fs_block_3 := FileSystemBlock(
-                        block_type=BlockType.FILE_SYSTEM_BLOCK,
                         target=FileSystemType.FILE,
                         action=FileSystemAction.DELETE,
                         loc="/C/user/temp/",
@@ -206,7 +192,6 @@ class Command(BaseCommand):
                 "name": "Test 4: FileSystemBlock COMPRESS action",
                 "command": service.convert_file_system_block_to_str_code(
                     fs_block_4 := FileSystemBlock(
-                        block_type=BlockType.FILE_SYSTEM_BLOCK,
                         target=FileSystemType.FILE,
                         action=FileSystemAction.COMPRESS,
                         loc="/C/user/logs/",
@@ -221,7 +206,6 @@ class Command(BaseCommand):
                 "name": "Test 5: FileSystemBlock MOVE action",
                 "command": service.convert_file_system_block_to_str_code(
                     fs_block_5 := FileSystemBlock(
-                        block_type=BlockType.FILE_SYSTEM_BLOCK,
                         target=FileSystemType.FILE,
                         action=FileSystemAction.MOVE,
                         loc="/C/user/downloads/",
@@ -241,7 +225,6 @@ class Command(BaseCommand):
                 "name": "Test 7: LoopBlock with mixed actions",
                 "command": service.convert_loop_block_to_str_code(
                     loop_block_mixed := LoopBlock(
-                        block_type=BlockType.BASE_LOOP_BLOCK,
                         iter_cnt="3",
                         body=[fs_block_1, fs_block_4, fs_block_5],
                     ),
@@ -253,7 +236,6 @@ class Command(BaseCommand):
                 "name": "Test 8: ReferenceBlock containing LoopBlock",
                 "command": service.render_reference_block_to_str_code(
                     reference_block_1 := ReferenceBlock(
-                        block_type=BlockType.REFERENCE_BLOCK,
                         reference_id="func_nested_1",
                     ),
                     block_functions,
@@ -264,11 +246,9 @@ class Command(BaseCommand):
                 "name": "Test 9: LoopBlock with nested ReferenceBlock containing LoopBlock",
                 "command": service.convert_loop_block_to_str_code(
                     loop_block_complex := LoopBlock(
-                        block_type=BlockType.BASE_LOOP_BLOCK,
                         iter_cnt="2",
                         body=[
                             reference_block_3 := ReferenceBlock(
-                                block_type=BlockType.REFERENCE_BLOCK,
                                 reference_id="func_nested_3",
                             ),
                             fs_block_5,
@@ -282,7 +262,6 @@ class Command(BaseCommand):
                 "name": "Test 10: FileSystemBlock with PRINT action",
                 "command": service.convert_file_system_block_to_str_code(
                     fs_block_6 := FileSystemBlock(
-                        block_type=BlockType.FILE_SYSTEM_BLOCK,
                         target=FileSystemType.FILE,
                         action=FileSystemAction.PRINT,
                         loc="/C/user/images/",
@@ -297,7 +276,6 @@ class Command(BaseCommand):
                 "name": "Test 12: LoopBlock with high iteration count",
                 "command": service.convert_loop_block_to_str_code(
                     loop_block_high_iter := LoopBlock(
-                        block_type=BlockType.BASE_LOOP_BLOCK,
                         iter_cnt="100",
                         body=[fs_block_1],
                     ),
@@ -309,15 +287,12 @@ class Command(BaseCommand):
                 "name": "Test 13: Deeply nested LoopBlocks",
                 "command": service.convert_loop_block_to_str_code(
                     deeply_nested_loop := LoopBlock(
-                        block_type=BlockType.BASE_LOOP_BLOCK,
                         iter_cnt="2",
                         body=[
                             LoopBlock(
-                                block_type=BlockType.BASE_LOOP_BLOCK,
                                 iter_cnt="2",
                                 body=[
                                     LoopBlock(
-                                        block_type=BlockType.BASE_LOOP_BLOCK,
                                         iter_cnt="2",
                                         body=[fs_block_1],
                                     )
@@ -376,18 +351,13 @@ class Command(BaseCommand):
 
         print("\nGenerated script has been written to 'generated_script.py'.")
 
-        worksheet = Worksheet(
-            id="ws1",
-            name="TestWorksheet",
-            owner_id="user1",
-            main_blocks=[
+        main_block1 = MainBlock(
+            body=[
                 LoopBlock(
-                    block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
                     body=[
                         # First FileSystemBlock in the outer loop
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.COPY,
                             loc="/C/user/documents/",
@@ -397,17 +367,14 @@ class Command(BaseCommand):
                         ),
                         # Nested LoopBlock inside the main LoopBlock
                         LoopBlock(
-                            block_type=BlockType.BASE_LOOP_BLOCK,
                             iter_cnt="3",
                             body=[
                                 # Reference to nested_function_1 containing its own nested loop
                                 ReferenceBlock(
-                                    block_type=BlockType.REFERENCE_BLOCK,
                                     reference_id="func_nested_1",
                                 ),
                                 # Another FileSystemBlock in this inner loop
                                 FileSystemBlock(
-                                    block_type=BlockType.FILE_SYSTEM_BLOCK,
                                     target=FileSystemType.FILE,
                                     action=FileSystemAction.MOVE,
                                     loc="/C/user/downloads/",
@@ -420,17 +387,14 @@ class Command(BaseCommand):
                             ],
                         ),
                         LoopBlock(
-                            block_type=BlockType.BASE_LOOP_BLOCK,
                             iter_cnt="3",
                             body=[
                                 # Reference to nested_function_1 containing its own nested loop
                                 ReferenceBlock(
-                                    block_type=BlockType.REFERENCE_BLOCK,
                                     reference_id="func_nested_1",
                                 ),
                                 # Another FileSystemBlock in this inner loop
                                 FileSystemBlock(
-                                    block_type=BlockType.FILE_SYSTEM_BLOCK,
                                     target=FileSystemType.FILE,
                                     action=FileSystemAction.MOVE,
                                     loc="/C/user/downloads/",
@@ -443,17 +407,14 @@ class Command(BaseCommand):
                             ],
                         ),
                         LoopBlock(
-                            block_type=BlockType.BASE_LOOP_BLOCK,
                             iter_cnt="3",
                             body=[
                                 # Reference to nested_function_1 containing its own nested loop
                                 ReferenceBlock(
-                                    block_type=BlockType.REFERENCE_BLOCK,
                                     reference_id="func_nested_2",
                                 ),
                                 # Another FileSystemBlock in this inner loop
                                 FileSystemBlock(
-                                    block_type=BlockType.FILE_SYSTEM_BLOCK,
                                     target=FileSystemType.FILE,
                                     action=FileSystemAction.MOVE,
                                     loc="/C/user/downloads/",
@@ -467,12 +428,14 @@ class Command(BaseCommand):
                         ),
                         # Reference to another function at the end of the main loop
                         ReferenceBlock(
-                            block_type=BlockType.REFERENCE_BLOCK,
                             reference_id="func_nested_2",
                         ),
                     ],
                 )
-            ],
+            ]
+        )
+        worksheet = Worksheet(
+            id="ws1", name="TestWorksheet", owner_id="user1", main_block=main_block1
         )
         # Test Case for Worksheet Script Generation
         try:

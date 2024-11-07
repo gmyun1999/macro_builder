@@ -1,13 +1,14 @@
 import httpx
 
+from macro_sheet.domain.block.base_block.loop_block import LoopBlock
+from macro_sheet.domain.block.base_block.main_block import MainBlock
+from macro_sheet.domain.block.base_block.reference_block import ReferenceBlock
 from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileConditionDetail,
     FileSystemAction,
     FileSystemBlock,
     FileSystemType,
 )
-from macro_sheet.domain.block.loop_block.loop_block import LoopBlock
-from macro_sheet.domain.block.reference_block import ReferenceBlock
 from macro_sheet.domain.Function.block_function import BlockFunction
 from macro_sheet.domain.worksheet.worksheet import Worksheet
 
@@ -134,8 +135,14 @@ class BlockService:
         """
         self.generated_functions = {}
         commands = []
+        if worksheet.main_block is None:
+            raise ValueError("main block 이 존재해야함")
 
-        for block in worksheet.main_blocks:
+        main_block: MainBlock = worksheet.main_block
+        if not main_block.body:
+            raise ValueError("main block 의 내용이 존재해야함.")
+
+        for block in main_block.body:
             if isinstance(block, FileSystemBlock):
                 cmd = self.convert_file_system_block_to_str_code(block)
                 commands.append(cmd)
@@ -163,20 +170,6 @@ class BlockService:
             script_file.write(script_str)
 
         return script_path
-
-    def send_to_package_server(self, script_path: str):
-        # 동기 클라이언트를 사용하여 패키징 서버로 파일 전송
-        url = "http://localhost:8000/package"  # 패키징 서버 URL
-        with open(script_path, "rb") as f:
-            files = {"file": (script_path, f)}
-            response = httpx.post(url, files=files, timeout=120.0)
-
-        # 응답 처리
-        if response.status_code == 200:
-            download_link = response.json().get("download_link")
-            return download_link
-        else:
-            return None
 
 
 class PowerShellConverter:

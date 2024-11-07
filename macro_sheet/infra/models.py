@@ -36,7 +36,7 @@ class Worksheet(models.Model):
         related_name="worksheets",
         db_constraint=False,
     )
-    main_blocks = models.JSONField(default=list)
+    main_block = models.JSONField(default=None)
     blocks = models.JSONField(default=list)
 
     class Meta:

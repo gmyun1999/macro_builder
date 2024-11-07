@@ -1,5 +1,6 @@
 import uuid
 
+from macro_sheet.domain.block.base_block.main_block import MainBlock
 from macro_sheet.domain.block.block import Block
 from macro_sheet.domain.worksheet.worksheet import Worksheet
 from macro_sheet.service.i_repo.i_worksheet_repo import IWorksheetRepo
@@ -17,7 +18,7 @@ class WorksheetUseCase:
         worksheet_id: str,
         worksheet_name: str,
         owner_id: str | None,
-        main_blocks: list[Block | None],
+        main_block: MainBlock,
         blocks: list[Block | None],
         related_function_ids: list[str] | None,
     ) -> tuple[bool, str]:
@@ -32,9 +33,11 @@ class WorksheetUseCase:
             id=worksheet_id,
             name=worksheet_name,
             owner_id=owner_id,
-            main_blocks=main_blocks,
+            main_block=main_block,
             blocks=blocks,
         )
+
+        # TODO: check function id 가 존재하는지
         self.worksheet_service.update_worksheet(
             worksheet_vo=worksheet, function_ids=related_function_ids
         )
@@ -45,7 +48,7 @@ class WorksheetUseCase:
         self,
         worksheet_name: str,
         owner_id: str | None,
-        main_blocks: list[Block | None],
+        main_block: MainBlock,
         blocks: list[Block | None],
         related_function_ids: list[str] | None,
     ) -> tuple[bool, str]:
@@ -60,7 +63,7 @@ class WorksheetUseCase:
             id=str(uuid.uuid4()),
             name=worksheet_name,
             owner_id=owner_id,
-            main_blocks=main_blocks,
+            main_block=main_block,
             blocks=blocks,
         )
         self.worksheet_service.create_worksheet_with_WorksheetFunction(

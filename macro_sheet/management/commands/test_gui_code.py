@@ -1,5 +1,8 @@
 from django.core.management.base import BaseCommand
 
+from macro_sheet.domain.block.base_block.loop_block import LoopBlock
+from macro_sheet.domain.block.base_block.main_block import MainBlock
+from macro_sheet.domain.block.base_block.reference_block import ReferenceBlock
 from macro_sheet.domain.block.block import BlockType
 from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileConditionDetail,
@@ -7,12 +10,10 @@ from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileSystemBlock,
     FileSystemType,
 )
-from macro_sheet.domain.block.loop_block.loop_block import LoopBlock
-from macro_sheet.domain.block.reference_block import ReferenceBlock
 from macro_sheet.domain.Function.block_function import BlockFunction
 from macro_sheet.domain.worksheet.worksheet import Worksheet
-from macro_sheet.service.gui_service import GuiService
 from macro_sheet.service.service.block_service import BlockService
+from macro_sheet.service.service.gui_service import GuiService
 
 
 class Command(BaseCommand):
@@ -29,11 +30,9 @@ class Command(BaseCommand):
             name="NestedFunction1",
             blocks=[
                 LoopBlock(
-                    block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
                     body=[
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.DELETE,
                             loc=r"C:\Users\gmyun\OneDrive\바탕 화면\윤규민\test1",
@@ -42,7 +41,6 @@ class Command(BaseCommand):
                             rename=None,
                         ),
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.PRINT,
                             loc="/C/user/images/",
@@ -61,7 +59,6 @@ class Command(BaseCommand):
             name="NestedFunction2",
             blocks=[
                 FileSystemBlock(
-                    block_type=BlockType.FILE_SYSTEM_BLOCK,
                     target=FileSystemType.FILE,
                     action=FileSystemAction.COMPRESS,
                     loc="/C/user/logs/",
@@ -78,11 +75,9 @@ class Command(BaseCommand):
             name="NestedFunction3",
             blocks=[
                 LoopBlock(
-                    block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
                     body=[
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.DELETE,
                             loc="/C/user/temp/",
@@ -97,19 +92,13 @@ class Command(BaseCommand):
 
         block_functions = [nested_function_1, nested_function_2, nested_function_3]
 
-        # Prepare the Worksheet with complex blocks
-        worksheet = Worksheet(
-            id="ws1",
-            name="TestWorksheet",
-            owner_id="user1",
-            main_blocks=[
+        main_block = MainBlock(
+            body=[
                 LoopBlock(
-                    block_type=BlockType.BASE_LOOP_BLOCK,
                     iter_cnt="2",
                     body=[
                         # First FileSystemBlock in the outer loop
                         FileSystemBlock(
-                            block_type=BlockType.FILE_SYSTEM_BLOCK,
                             target=FileSystemType.FILE,
                             action=FileSystemAction.COPY,
                             loc="/C/user/documents/",
@@ -119,17 +108,14 @@ class Command(BaseCommand):
                         ),
                         # Nested LoopBlock inside the main LoopBlock
                         LoopBlock(
-                            block_type=BlockType.BASE_LOOP_BLOCK,
                             iter_cnt="3",
                             body=[
                                 # Reference to nested_function_1 containing its own nested loop
                                 ReferenceBlock(
-                                    block_type=BlockType.REFERENCE_BLOCK,
                                     reference_id="func_nested_1",
                                 ),
                                 # Another FileSystemBlock in this inner loop
                                 FileSystemBlock(
-                                    block_type=BlockType.FILE_SYSTEM_BLOCK,
                                     target=FileSystemType.FILE,
                                     action=FileSystemAction.MOVE,
                                     loc="/C/user/downloads/",
@@ -143,21 +129,24 @@ class Command(BaseCommand):
                         ),
                         # Reference to another function at the end of the main loop
                         ReferenceBlock(
-                            block_type=BlockType.REFERENCE_BLOCK,
                             reference_id="func_nested_2",
                         ),
                     ],
                 )
-            ],
+            ]
         )
-
-        worksheet1 = Worksheet(
+        # Prepare the Worksheet with complex blocks
+        worksheet = Worksheet(
             id="ws1",
             name="TestWorksheet",
             owner_id="user1",
-            main_blocks=[
+            main_block=main_block,
+            blocks=[],
+        )
+
+        main_block1 = MainBlock(
+            body=[
                 FileSystemBlock(
-                    block_type=BlockType.FILE_SYSTEM_BLOCK,
                     target=FileSystemType.FILE,
                     action=FileSystemAction.DELETE,
                     loc="C:\\Users\\gmyun\\OneDrive\\바탕 화면\\윤규민\\test1",
@@ -165,7 +154,10 @@ class Command(BaseCommand):
                     destination=None,
                     rename=None,
                 )
-            ],
+            ]
+        )
+        worksheet1 = Worksheet(
+            id="ws1", name="TestWorksheet", owner_id="user1", main_block=main_block1
         )
 
         script_code = block_service.generate_script_from_worksheet(
