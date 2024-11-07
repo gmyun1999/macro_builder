@@ -23,3 +23,4 @@ class GuiUseCase:
         단 로그인 안했으면 넘어온 link 저장안함.
         link를 반환함.
         """
+        pass

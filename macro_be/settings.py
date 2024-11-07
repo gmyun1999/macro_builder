@@ -98,6 +98,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "user",
     "macro_sheet",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
