@@ -1,13 +1,16 @@
 from macro_sheet.infra.packing_server import PackagingClient
+from macro_sheet.infra.repo.gui_repo import GuiRepo
 from macro_sheet.service.i_packaging_server.i_packaging_server import (
     PackagingClientInterface,
 )
+from macro_sheet.service.i_repo.i_gui_repo import IGuiRepo
 
 
 class GuiService:
     def __init__(self) -> None:
         # TODO: DI
         self.client: PackagingClientInterface = PackagingClient()
+        self.gui_repo: IGuiRepo = GuiRepo()
 
     def get_gui_link(self, script_code):
         """
@@ -15,9 +18,10 @@ class GuiService:
         어떤 형태로 해서 바로 패키지 서버로 보낸다음
         패키지 서버로부터 s3 link를 받는다.
         """
-        pass
+        download_url = self.client.send_to_package_server(script_content=script_code)
+        print(download_url)
 
-    def save_gui_link(
+    def save_gui(
         self,
     ):
         """

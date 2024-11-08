@@ -163,10 +163,9 @@ class Command(BaseCommand):
         script_code = block_service.generate_script_from_worksheet(
             block_functions=block_functions, worksheet=worksheet1
         )
-        script_path = block_service.convert_file_from_script(script_str=script_code)
 
         # 2. 생성된 파일을 패키징 서버로 전송
-        download_link = gui_service.send_to_package_server(script_path)
+        download_link = gui_service.get_gui_link(script_code)
 
         # 3. 응답 출력
         if download_link:
