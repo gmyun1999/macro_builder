@@ -125,7 +125,7 @@ class BlockFunctionService:
             filter=self.blk_func_repo.Filter(owner_id=owner_id)
         )
 
-    def get_ancestors(self, function_id: str) -> list[str]:
+    def get_ancestors_ids(self, function_id: str) -> list[str]:
         """
         주어진 함수의 모든 부모 함수 ID를 조회합니다.
         """
@@ -158,7 +158,7 @@ class BlockFunctionService:
         """
         ancestors = set()
         for related_func in related_function_ids:
-            related_ancestors = self.get_ancestors(function_id=related_func)
+            related_ancestors = self.get_ancestors_ids(function_id=related_func)
             ancestors.update(related_ancestors)
 
             if target_function_id in ancestors:

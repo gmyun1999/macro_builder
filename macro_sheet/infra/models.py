@@ -88,23 +88,24 @@ class FunctionHierarchy(models.Model):
 class Gui(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    owner = models.ForeignKey(
-        User,
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name="gui_owner",
-        db_constraint=False,
-    )
-    worksheet = models.ForeignKey(
-        Worksheet,
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name="gui_worksheets",
-        db_constraint=False,
-    )
     url = models.URLField(max_length=500)
 
     class Meta:
         db_table = "Gui"
+
+
+class Script(models.Model):
+    """
+    gui 만들때 같이 만들어지는 스크립트
+    동일한 스크립트가 있는지 확인할때 hash 값으로 비교한다.
+    """
+
+    id = models.CharField(max_length=255, primary_key=True)
+    script_code = models.TextField()
+    script_hash = models.CharField(max_length=64, unique=True)
+    gui_id = models.ForeignKey(
+        Gui, related_name="script_gui", on_delete=models.CASCADE, db_constraint=False
+    )
+
+    class Meta:
+        db_table = "Script"

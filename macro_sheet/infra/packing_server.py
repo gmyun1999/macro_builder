@@ -1,12 +1,13 @@
 import httpx
 
+from macro_be.settings import PACKAGE_SERVER_URL
 from macro_sheet.service.i_packaging_server.i_packaging_server import (
     PackagingClientInterface,
 )
 
 
 class PackagingClient(PackagingClientInterface):
-    def __init__(self, base_url: str = "http://localhost:8000"):
+    def __init__(self, base_url: str = PACKAGE_SERVER_URL):
         self.base_url = base_url
 
     def send_to_package_server(self, script_content: str) -> str | None:
@@ -14,7 +15,7 @@ class PackagingClient(PackagingClientInterface):
         패키징 서버에 스크립트를 문자열로 업로드하고 GUI 다운로드 링크를 반환한다.
         """
         url = f"{self.base_url}/package"
-        payload = {"content": script_content}  # "content" 키로 변경
+        payload = {"content": script_content}
 
         response = httpx.post(url, json=payload, timeout=120.0)
 

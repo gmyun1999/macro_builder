@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from macro_sheet.domain.gui.gui import Gui as GuiVo
+from macro_sheet.domain.gui.gui import Script as ScriptVo
 
 
 class IGuiRepo(ABC):
@@ -8,12 +9,8 @@ class IGuiRepo(ABC):
         def __init__(
             self,
             id: str | None = None,
-            owner_id: str | None = None,
-            worksheet_id: str | None = None,
         ) -> None:
             self.id = id
-            self.owner_id = owner_id
-            self.worksheet_id = worksheet_id
 
     @abstractmethod
     def create(self, gui_vo: GuiVo) -> GuiVo:
@@ -41,4 +38,37 @@ class IGuiRepo(ABC):
         """
         gui의 정보를 삭제한다.
         """
+        pass
+
+
+class IScriptRepo:
+    class Filter:
+        def __init__(
+            self,
+            script_hash: str | None = None,
+            id: str | None = None,
+            gui_id: str | None = None,
+        ):
+            self.script_hash = script_hash
+            self.id = id
+            self.gui_id = gui_id
+
+    @abstractmethod
+    def get(self, filter: Filter) -> ScriptVo | None:
+        pass
+
+    @abstractmethod
+    def create(self, script: ScriptVo):
+        pass
+
+    @abstractmethod
+    def delete(self, script_id: str):
+        pass
+
+    @abstractmethod
+    def get_or_create_by_hash(self, script: ScriptVo) -> ScriptVo:
+        pass
+
+    @abstractmethod
+    def is_same_script_code(self, script_hash: str) -> bool:
         pass

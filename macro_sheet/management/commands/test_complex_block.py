@@ -351,6 +351,41 @@ class Command(BaseCommand):
 
         print("\nGenerated script has been written to 'generated_script.py'.")
 
+        main_block1_without_refer = MainBlock(
+            body=[
+                LoopBlock(
+                    iter_cnt="3",
+                    body=[
+                        # Another FileSystemBlock in this inner loop
+                        FileSystemBlock(
+                            target=FileSystemType.FILE,
+                            action=FileSystemAction.MOVE,
+                            loc="/C/user/downloads/",
+                            condition=[{FileConditionDetail.NAME_ENDSWITH: "_old"}],
+                            destination="/C/user/old_downloads/",
+                            rename=None,
+                        ),
+                        LoopBlock(
+                            iter_cnt="3",
+                            body=[
+                                # Another FileSystemBlock in this inner loop
+                                FileSystemBlock(
+                                    target=FileSystemType.FILE,
+                                    action=FileSystemAction.MOVE,
+                                    loc="/C/user/downloads/",
+                                    condition=[
+                                        {FileConditionDetail.NAME_ENDSWITH: "_old"}
+                                    ],
+                                    destination="/C/user/old_downloads/",
+                                    rename=None,
+                                ),
+                            ],
+                        ),
+                    ],
+                ),
+            ]
+        )
+
         main_block1 = MainBlock(
             body=[
                 LoopBlock(
@@ -437,6 +472,13 @@ class Command(BaseCommand):
         worksheet = Worksheet(
             id="ws1", name="TestWorksheet", owner_id="user1", main_block=main_block1
         )
+        worksheet_without_refer = Worksheet(
+            id="ws_without_refer",
+            name="TestWorksheet_without_refer",
+            owner_id=None,
+            main_block=main_block1_without_refer,
+        )
+
         # Test Case for Worksheet Script Generation
         try:
             print("\n=== Test 14: Worksheet Full Script Generation ===")
@@ -458,3 +500,22 @@ class Command(BaseCommand):
             f.write(generated_script)
 
         print("\nGenerated script has been written to 'generated_script.py'.")
+
+        try:
+            print("\n=== Test 15: Worksheet Full Script Generation ===")
+            generated_script = service.generate_script_from_worksheet(
+                worksheet=worksheet_without_refer, block_functions=[]
+            )
+            print("Generated Script:")
+            print(generated_script)
+            print("Test Result: PASS")
+        except Exception as e:
+            print("Test Result: FAIL (Exception occurred: {}")
+            from traceback import format_exc
+
+            print("Exception details:")
+            print(format_exc())
+
+        # Save the generated script to a file
+        with open("generated_script1.py", "w") as f:
+            f.write(generated_script)
