@@ -16,7 +16,9 @@ class BlockFunctionUseCase:
         """
         if related_function_ids is not None:
             self.block_function_service.check_is_exist_id(function_id=block_function.id)
-
+            self.block_function_service.check_recursion(
+                function_id=block_function.id, related_function_ids=related_function_ids
+            )
             self.block_function_service.check_circular(
                 target_function_id=block_function.id,
                 related_function_ids=related_function_ids,
@@ -33,6 +35,7 @@ class BlockFunctionUseCase:
         """
         블럭함수를 새로 생성하는
         - 순환 참조가 발생하는지 체크해야함. - create에서는 발생할수가없음
+        - 재귀가 있는지 체크해야함 - create 에서는 발생할수가없음
         - reference block 이 있다면 존재하는지를 체크해야함.
         """
         if related_function_ids is not None:

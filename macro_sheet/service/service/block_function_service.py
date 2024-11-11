@@ -166,6 +166,14 @@ class BlockFunctionService:
 
         return False  # 순환 참조 없음
 
+    def check_recursion(
+        self, function_id: str, related_function_ids: list[str]
+    ) -> bool:
+        """
+        재귀인지를 확인한다
+        """
+        return function_id in related_function_ids
+
     def check_is_exist_id(self, function_id: str) -> bool:
         """
         function_id가 존재하는지를 확인한다.
