@@ -1,0 +1,3 @@
+POST {{macro-host}}/worksheet/validate
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}

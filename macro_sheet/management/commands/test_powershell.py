@@ -452,7 +452,7 @@ class Command(BaseCommand):
             expected_command = case["expected_command"]
             try:
                 # Convert DTO to object
-                filesystem_block = FileSystemBlock.from_dto(test_data)
+                filesystem_block = FileSystemBlock.from_dict(test_data)
 
                 # Perform validation
                 filesystem_block.validate()

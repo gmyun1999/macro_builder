@@ -16,22 +16,8 @@ class TestView(APIView):
 
     @dataclass
     class BodyParams(BaseModel):
-        data: dict = Field()
+        data: int = Field(gt=0)
 
     @validate_body(BodyParams)
     def post(self, request, body):
-        block_dict = body.data
-        # 얘를 도메인 객체로 매핑해줘야함.
-        # dict 을 저장한다
-        serializer = GenericSerializer(block_dict)
-        if serializer.is_valid():
-            domain = serializer.to_domain_object()
-
-        # if validator 가 올바르게 작동했을경우:
-        # return JsonResponse(status=status.HTTP_200_OK, data='')
-        # else:
-        #     return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data='')
-
-        # 도메인 객체를 저장한다.
-        # 도메인 객체를 jinja2 템플릿으로 변경시킨다.
-        # 생성한 템플릿을 json으로 패키지 서버로 보낸다.
+        pass

@@ -10,7 +10,7 @@ class Function(models.Model):
     Function 모델은 블록에서 참조되는 기능을 나타냅니다.
     """
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(primary_key=True, max_length=36)
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="functions", db_constraint=False
     )
@@ -26,7 +26,7 @@ class Worksheet(models.Model):
     Worksheet 모델은 사용자 작업 공간을 나타내며, 블록들을 JSON 형식으로 저장합니다.
     """
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(primary_key=True, max_length=36)
     name = models.CharField(max_length=255)
     owner = models.ForeignKey(
         User,
@@ -38,6 +38,8 @@ class Worksheet(models.Model):
     )
     main_block = models.JSONField(default=None)
     blocks = models.JSONField(default=list)
+    raw_main_block = models.JSONField(default=list)
+    raw_blocks = models.JSONField(default=list)
 
     class Meta:
         db_table = "Worksheet"

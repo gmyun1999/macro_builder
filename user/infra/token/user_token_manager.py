@@ -66,7 +66,7 @@ class UserTokenManager(ITokenManager):
         )
 
     def _create_user_token(self, user_payload_vo: UserTokenPayload) -> str:
-        payload = user_payload_vo.to_dto()
+        payload = user_payload_vo.to_dict()
         jwt_token = jwt.encode(payload, self.JWT_SECRET, self.JWT_ALGORITHM)
 
         return jwt_token

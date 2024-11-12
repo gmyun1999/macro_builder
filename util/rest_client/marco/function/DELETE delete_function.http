@@ -1,0 +1,6 @@
+DELETE {{macro-host}}/me/function/1
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+
+# 나의 function 중에서 id 가 1인 function을 삭제

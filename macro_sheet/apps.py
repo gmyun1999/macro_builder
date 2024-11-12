@@ -13,6 +13,7 @@ class MacroSheetConfig(AppConfig):
         from macro_sheet.domain.block.base_block.condition_block import ConditionBlock
         from macro_sheet.domain.block.base_block.loop_block import LoopBlock
         from macro_sheet.domain.block.base_block.main_block import MainBlock
+        from macro_sheet.domain.block.base_block.reference_block import ReferenceBlock
         from macro_sheet.domain.block.file_system_block import file_system_block
         from macro_sheet.domain.Function.block_function import BlockFunction
         from macro_sheet.domain.worksheet.worksheet import Worksheet

@@ -1,0 +1,5 @@
+POST {{macro-host}}/me/function
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+# function을 생성한다.

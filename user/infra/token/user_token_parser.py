@@ -29,7 +29,7 @@ class UserTokenParser(ITokenParser):
             if not payload[UserTokenPayload.FIELD_ROLE] in allowed_roles:
                 return None, response_msg.TokenMessage.ROLE_NO_PERMISSION
 
-            user_token_payload_vo = UserTokenPayload.from_dto(payload)
+            user_token_payload_vo = UserTokenPayload.from_dict(payload)
             return user_token_payload_vo, response_msg.TokenMessage.VALID
 
         except jwt.ExpiredSignatureError:

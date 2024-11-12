@@ -22,6 +22,5 @@ class ConditionBlock(Block):
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "ConditionBlock":
         return cls(
-            position=data.get(cls.FIELD_POSITION)
             # 추가 필드가 있다면 여기서 초기화
         )

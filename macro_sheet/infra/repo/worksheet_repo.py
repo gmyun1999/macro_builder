@@ -24,6 +24,8 @@ class WorksheetRepo(IWorksheetRepo):
                 owner_id=worksheet.owner_id,
                 main_block=worksheet.main_block,
                 blocks=worksheet.blocks,
+                raw_blocks=worksheet.raw_blocks,
+                raw_main_block=worksheet.raw_main_block,
             )
             for worksheet in queryset
         ]
@@ -47,6 +49,8 @@ class WorksheetRepo(IWorksheetRepo):
             owner_id=worksheet_obj.owner_id,
             main_block=dicted_main_block,
             blocks=blocks,
+            raw_blocks=worksheet_obj.raw_blocks,
+            raw_main_block=worksheet_obj.raw_main_block,
         )
         worksheet.save()
 
@@ -56,6 +60,8 @@ class WorksheetRepo(IWorksheetRepo):
             owner_id=worksheet.owner_id,
             main_block=dicted_main_block,
             blocks=blocks,
+            raw_blocks=worksheet_obj.raw_blocks,
+            raw_main_block=worksheet_obj.raw_main_block,
         )
 
     def update_worksheet(
@@ -86,6 +92,8 @@ class WorksheetRepo(IWorksheetRepo):
             owner_id=worksheet.owner_id,
             main_block=worksheet.main_block,
             blocks=worksheet.blocks,
+            raw_main_block=worksheet.raw_main_block,
+            raw_blocks=worksheet.raw_blocks,
         )
 
     def delete_worksheet(self, worksheet_id: str) -> bool:

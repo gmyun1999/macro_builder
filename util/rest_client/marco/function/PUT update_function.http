@@ -1,0 +1,5 @@
+PUT {{macro-host}}/me/function/1
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+# function 1을 update 한다.

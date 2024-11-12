@@ -35,5 +35,4 @@ class ReferenceBlock(Block):
             reference_function_name=data.get(
                 cls.FIELD_REFERENCE_FUNCTION_NAME, "UnKnown"
             ),
-            position=data.get(cls.FIELD_POSITION),
         )

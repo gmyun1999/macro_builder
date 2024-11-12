@@ -1,0 +1,116 @@
+PUT {{macro-host}}/me/worksheet/f020c8f0-e34f-4397-8d25-587733703ab2/
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+{
+    "id": "f020c8f0-e34f-4397-8d25-587733703ab2",
+    "name" :"ws123",
+  "main_block": {
+    "block_type": "MAIN_BLOCK",
+    "body": [
+      {
+        "block_type": "BASE_LOOP_BLOCK",
+        "iter_cnt": "3",
+        "body": [
+          {
+            "block_type": "FILE_SYSTEM_BLOCK",
+            "target": "FILE",
+            "action": "COPY",
+            "loc": "/C/user/documents/",
+            "condition": [
+              { "FILE_EXTENSION": "txt" }
+            ],
+            "destination": "/C/user/backup",
+            "rename": null
+          },
+          {
+            "block_type": "BASE_LOOP_BLOCK",
+            "iter_cnt": "3",
+            "body": [
+              {
+                "block_type": "REFERENCE_BLOCK",
+                "reference_id": "func_nested_1",
+                "reference_function_name": "UnKnown"
+              },
+              {
+                "block_type": "FILE_SYSTEM_BLOCK",
+                "target": "FILE",
+                "action": "MOVE",
+                "loc": "/C/user/downloads/",
+                "condition": [
+                  { "FILE_NAME_ENDSWITH": "_old" }
+                ],
+                "destination": "/C/user/old_downloads/",
+                "rename": null
+              }
+            ]
+          },
+          {
+            "block_type": "BASE_LOOP_BLOCK",
+            "iter_cnt": "3",
+            "body": [
+              {
+                "block_type": "REFERENCE_BLOCK",
+                "reference_id": "func_nested_1",
+                "reference_function_name": "UnKnown"
+              },
+              {
+                "block_type": "FILE_SYSTEM_BLOCK",
+                "target": "FILE",
+                "action": "MOVE",
+                "loc": "/C/user/downloads/",
+                "condition": [
+                  { "FILE_NAME_ENDSWITH": "_old" }
+                ],
+                "destination": "/C/user/old_downloads/",
+                "rename": null
+              }
+            ]
+          },
+          {
+            "block_type": "BASE_LOOP_BLOCK",
+            "iter_cnt": "3",
+            "body": [
+              {
+                "block_type": "REFERENCE_BLOCK",
+                "reference_id": "func_nested_2",
+                "reference_function_name": "UnKnown"
+              },
+              {
+                "block_type": "FILE_SYSTEM_BLOCK",
+                "target": "FILE",
+                "action": "MOVE",
+                "loc": "/C/user/downloads/",
+                "condition": [
+                  { "FILE_NAME_ENDSWITH": "_old" }
+                ],
+                "destination": "/C/user/old_downloads/",
+                "rename": null
+              }
+            ]
+          },
+          {
+            "block_type": "REFERENCE_BLOCK",
+            "reference_id": "func_nested_2",
+            "reference_function_name": "UnKnown"
+          }
+        ]
+      }
+    ]
+  },
+  "blocks": [
+              {
+            "block_type": "REFERENCE_BLOCK",
+            "reference_id": "func_nested_2",
+            "reference_function_name": "UnKnown"
+          },
+                    {
+            "block_type": "REFERENCE_BLOCK",
+            "reference_id": "func_nested_2",
+            "reference_function_name": "UnKnown"
+          }
+  ],
+    "related_function_ids" : ["1","2","3","4","5"],
+    "raw_blocks": [], 
+    "raw_main_block": []
+}

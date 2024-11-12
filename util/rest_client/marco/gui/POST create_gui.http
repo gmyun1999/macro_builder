@@ -1,0 +1,4 @@
+POST {{macro-host}}/gui
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+

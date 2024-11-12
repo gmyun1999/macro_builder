@@ -1,0 +1,5 @@
+POST {{macro-host}}/function/validate
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+# function이 validate 한지를 check 한다.

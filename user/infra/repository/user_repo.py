@@ -18,7 +18,7 @@ class UserRepo(IUserRepo):
         user_dict = serializer.data
 
         if user_dict:
-            return UserVo.from_dto(dto=user_dict)
+            return UserVo.from_dict(dto=user_dict)
 
         return None
 
@@ -26,11 +26,11 @@ class UserRepo(IUserRepo):
         pass
 
     def create(self, user_vo: UserVo) -> UserVo:
-        serializer = UserSerializer(data=user_vo.to_dto)
+        serializer = UserSerializer(data=user_vo.to_dict)
 
         if serializer.is_valid():
             serializer.save()
 
-            return user_vo.from_dto(serializer.data)
+            return user_vo.from_dict(serializer.data)
         else:
             raise DatabaseError(serializer.errors)

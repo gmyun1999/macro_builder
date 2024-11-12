@@ -20,18 +20,13 @@ class BlockType(StrEnum):
 
 
 @dataclass
-class Block(Domain):
-    FIELD_BLOCK_TYPE = " block_type"
-    FIELD_POSITION = "position"
+class Block:
+    FIELD_BLOCK_TYPE = "block_type"
 
     block_type: BlockType
-    position: tuple[str, str] | None = None  # x,y 좌표
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            self.FIELD_BLOCK_TYPE: self.block_type.value,
-            self.FIELD_POSITION: self.position,
-        }
+        return {self.FIELD_BLOCK_TYPE: self.block_type.value}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Block":

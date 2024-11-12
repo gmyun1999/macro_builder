@@ -1,1 +1,3 @@
-# user/login/<str:auth_server>
+GET {{macro-host}}/user/login/google
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}

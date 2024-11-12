@@ -74,12 +74,7 @@ class WorksheetService:
 
     def fetch_worksheet(
         self, worksheet_id: str | None = None, owner_id: str | None = None
-    ) -> list[IWorksheetRepo.WorksheetDTO] | None:
+    ) -> list[IWorksheetRepo.WorksheetDTO]:
         filter_obj = IWorksheetRepo.Filter(id=worksheet_id, owner_id=owner_id)
 
-        worksheets = self.worksheet_repo.fetch_worksheet(filter_obj)
-
-        if worksheets:
-            return worksheets
-
-        return None
+        return self.worksheet_repo.fetch_worksheet(filter_obj)

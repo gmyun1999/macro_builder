@@ -1,0 +1,5 @@
+DELETE {{macro-host}}/me/worksheet/f020c8f0-e34f-4397-8d25-587733703ab2/
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+#id 2인 worksheet 삭제

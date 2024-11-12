@@ -41,5 +41,4 @@ class LoopBlock(Block):
                 Block.from_dict(block_data)
                 for block_data in data.get(cls.FIELD_BODY, [])
             ],
-            position=data.get(cls.FIELD_POSITION),
         )

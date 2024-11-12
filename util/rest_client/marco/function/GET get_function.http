@@ -1,0 +1,6 @@
+GET {{macro-host}}/me/function/1
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+
+# 나의 function 중 id 가 1인거 fetch

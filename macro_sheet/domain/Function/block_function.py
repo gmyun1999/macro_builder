@@ -6,7 +6,7 @@ from macro_sheet.domain.block.block import Block
 
 
 @dataclass
-class BlockFunction(Domain):
+class BlockFunction:
     FIELD_ID = "id"
     FIELD_OWNER_ID = "owner_id"
     FIELD_NAME = "name"

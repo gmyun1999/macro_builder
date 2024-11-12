@@ -1,0 +1,3 @@
+GET {{macro-host}}/me/worksheets/
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}

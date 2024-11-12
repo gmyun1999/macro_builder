@@ -1,0 +1,3 @@
+GET {{macro-host}}/me/functions
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}

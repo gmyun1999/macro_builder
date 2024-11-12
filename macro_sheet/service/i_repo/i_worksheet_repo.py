@@ -1,28 +1,29 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
+from common.domain import Domain
 from macro_sheet.domain.worksheet.worksheet import Worksheet as WorksheetVo
 
 
 class IWorksheetRepo(ABC):
     class Filter:
-        def __init__(self, id: str | None = None, owner_id: str | None = None):
+        def __init__(
+            self,
+            id: str | None = None,
+            owner_id: str | None = None,
+        ):
             self.id = id
             self.owner_id = owner_id
 
-    class WorksheetDTO:
-        def __init__(
-            self,
-            id: str,
-            name: str,
-            owner_id: str | None,
-            main_block: dict | None,
-            blocks: list[dict | None],
-        ):
-            self.id = id
-            self.name = name
-            self.owner_id = owner_id
-            self.main_block = main_block
-            self.blocks = blocks
+    @dataclass
+    class WorksheetDTO(Domain):
+        id: str
+        name: str
+        owner_id: str | None
+        main_block: dict | None
+        blocks: list[dict | None]
+        raw_blocks: list
+        raw_main_block: list
 
     @abstractmethod
     def fetch_worksheet(self, filter: Filter) -> list[WorksheetDTO]:

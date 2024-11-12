@@ -1,0 +1,3 @@
+GET {{macro-host}}/me/worksheet/d5ddc5de-fb93-4607-ad4e-d720891ea918
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}

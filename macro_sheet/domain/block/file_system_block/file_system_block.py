@@ -100,7 +100,6 @@ class FileSystemBlock(Block):
             condition=conditions,
             destination=data.get(cls.FIELD_DESTINATION),
             rename=data.get(cls.FIELD_RENAME),
-            position=data.get(cls.FIELD_POSITION),
         )
 
     def validate(self) -> bool:

@@ -10,7 +10,7 @@ from macro_sheet.domain.registry import register_block_type
 class MainBlock(Block):
     FIELD_BODY = "body"
 
-    body: list[Block | None] = field(default_factory=list)
+    body: list[Block] = field(default_factory=list)
     block_type: BlockType = field(init=False)
 
     def __post_init__(self):
@@ -31,15 +31,13 @@ class MainBlock(Block):
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "MainBlock":
         if data.get(cls.FIELD_BLOCK_TYPE) != BlockType.MAIN_BLOCK.value:
+            print(data.get(cls.FIELD_BLOCK_TYPE))
+            print(BlockType.MAIN_BLOCK.value)
             raise ValueError(
                 f"Invalid block_type for MainBlock: {data.get(cls.FIELD_BLOCK_TYPE)}"
             )
 
         body_data = data.get(cls.FIELD_BODY, [])
-        body = [
-            Block.from_dict(block_data) if block_data is not None else None
-            for block_data in body_data
-        ]
-        position = data.get(cls.FIELD_POSITION, (None, None))
+        body = [Block.from_dict(block_data) for block_data in body_data]
 
-        return cls(body=body, position=position)
+        return cls(body=body)
