@@ -144,8 +144,6 @@ MIGRATION_MODULES = {
 pymysql.install_as_MySQLdb()
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-
 if ENV == "localhost":
     DATABASES = {
         "default": {
@@ -156,16 +154,14 @@ if ENV == "localhost":
 else:
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.mysql",
+            "ENGINE": "django.db.backends.postgresql",
             "NAME": "template",
             "USER": "admin",
             "PASSWORD": env("DB_PASSWORD", default=""),
             "HOST": env("DB_HOST", default=""),
-            "PORT": "3306",
+            "PORT": "5432",
             "OPTIONS": {
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-                "charset": "utf8mb4",
-                "use_unicode": True,
+                "options": "-c search_path=public,content",
             },
             "POOL_OPTIONS": {
                 "POOL_SIZE": 30,
