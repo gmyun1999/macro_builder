@@ -82,7 +82,7 @@ LOGGING = {
     },
 }
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['43.203.255.198']
 
 
 # Application definition
