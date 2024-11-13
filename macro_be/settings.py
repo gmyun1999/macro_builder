@@ -156,7 +156,7 @@ else:
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": "template",
-            "USER": "admin",
+            "USER": "macroAdmin",
             "PASSWORD": env("DB_PASSWORD", default=""),
             "HOST": env("DB_HOST", default=""),
             "PORT": "5432",
