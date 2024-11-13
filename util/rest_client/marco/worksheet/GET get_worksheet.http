@@ -1,3 +1,6 @@
-GET {{macro-host}}/me/worksheet/d5ddc5de-fb93-4607-ad4e-d720891ea918
+GET {{macro-host}}/me/worksheet/d5ddc5de-fb93-4607-ad4e-d720891ea918/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
+
+
+# id 가 d5ddc5de-fb93-4607-ad4e-d720891ea918인, worksheet 가져오기

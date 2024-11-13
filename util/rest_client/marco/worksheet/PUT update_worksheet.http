@@ -1,9 +1,9 @@
-PUT {{macro-host}}/me/worksheet/f020c8f0-e34f-4397-8d25-587733703ab2/
+PUT {{macro-host}}/me/worksheet/91f9b47c-5375-4cc0-a55a-c25e70f0f8bd/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
 {
-    "id": "f020c8f0-e34f-4397-8d25-587733703ab2",
+    "id": "91f9b47c-5375-4cc0-a55a-c25e70f0f8bd",
     "name" :"ws123",
   "main_block": {
     "block_type": "MAIN_BLOCK",

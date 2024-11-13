@@ -1,3 +1,3 @@
-GET {{macro-host}}/me/worksheets/
+GET {{macro-host}}/me/worksheets/?page=1&size=20
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}

@@ -1,5 +1,5 @@
-DELETE {{macro-host}}/me/worksheet/f020c8f0-e34f-4397-8d25-587733703ab2/
+DELETE {{macro-host}}/me/worksheet/91f9b47c-5375-4cc0-a55a-c25e70f0f8bd/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
-#id 2인 worksheet 삭제
+#id f020c8f0-e34f-4397-8d25-587733703ab2인 worksheet 삭제

@@ -1,8 +1,11 @@
+from typing import Any
+
 import httpx
 
 from macro_sheet.domain.block.base_block.loop_block import LoopBlock
 from macro_sheet.domain.block.base_block.main_block import MainBlock
 from macro_sheet.domain.block.base_block.reference_block import ReferenceBlock
+from macro_sheet.domain.block.block import Block, BlockType
 from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileConditionDetail,
     FileSystemAction,
@@ -162,6 +165,31 @@ class BlockService:
         full_script = "import subprocess\n" f"{functions_code}\n\n{main_code}"
 
         return full_script
+
+    def find_reference_blocks_in_block(self, block: Block) -> list[dict[str, str]]:
+        block_dict = block.to_dict()
+        references = []
+
+        def traverse(block: dict[str, Any]):
+            block_type = block.get(Block.FIELD_BLOCK_TYPE)
+            if block_type == BlockType.REFERENCE_BLOCK.value:
+                reference_id = block.get(ReferenceBlock.FIELD_REFERENCE_ID)
+                reference_function_name = block.get(
+                    ReferenceBlock.FIELD_REFERENCE_FUNCTION_NAME, "UnKnown"
+                )
+                references.append(
+                    {
+                        "reference_id": reference_id,
+                        "reference_function_name": reference_function_name,
+                    }
+                )
+
+            elif "body" in block and isinstance(block["body"], list):
+                for child_block in block["body"]:
+                    traverse(child_block)
+
+        traverse(block_dict)
+        return references
 
     def convert_file_from_script(self, script_str: str):
         # Python 파일로 저장

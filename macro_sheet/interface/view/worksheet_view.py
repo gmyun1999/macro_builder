@@ -71,7 +71,6 @@ class MYWorksheetView(APIView):
 
     class CreateBodyParams(BaseModel):
         name: str = Field(default="unknown", max_length=255)
-        related_function_ids: list[str] | None
         blocks: list
         main_block: dict
         raw_blocks: list
@@ -80,7 +79,6 @@ class MYWorksheetView(APIView):
     class UpdateBodyParams(BaseModel):
         id: str
         name: str = Field(default="unknown", max_length=255)
-        related_function_ids: list[str] | None
         blocks: list
         main_block: dict
         raw_blocks: list
@@ -96,6 +94,7 @@ class MYWorksheetView(APIView):
         """
         try:
             worksheet = self.worksheet_use_case.fetch_process(worksheet_id=worksheet_id)
+
         except WorksheetException as e:
             if hasattr(e, "code"):
                 return error_response(code=e.code, message=str(e), status=400)
@@ -118,13 +117,12 @@ class MYWorksheetView(APIView):
         """
         try:
             main_block_vo = MainBlock.from_dict(body.main_block)
-            blocks = [Block.from_dict(block) for block in body.blocks]
+            blocks_vo = [Block.from_dict(block) for block in body.blocks]
             worksheet_id = self.worksheet_use_case.create_process(
                 worksheet_name=body.name,
                 owner_id=token_payload.user_id,
                 main_block=main_block_vo,  # vo
-                blocks=blocks,  # list[vo]
-                related_function_ids=body.related_function_ids,
+                blocks=blocks_vo,  # list[vo]
                 raw_blocks=body.raw_blocks,
                 raw_main_block=body.raw_main_block,
             )
@@ -157,14 +155,13 @@ class MYWorksheetView(APIView):
                 return error_response(message="권한이 없습니다.")
 
             main_block_vo = MainBlock.from_dict(body.main_block)
-            blocks = [Block.from_dict(block) for block in body.blocks]
+            blocks_vo = [Block.from_dict(block) for block in body.blocks]
             self.worksheet_use_case.update_process(
                 worksheet_id=worksheet_id,
                 worksheet_name=body.name,
                 owner_id=token_payload.user_id,
                 main_block=main_block_vo,  # vo
-                blocks=blocks,  # list[vo]
-                related_function_ids=body.related_function_ids,
+                blocks=blocks_vo,  # list[vo]
                 raw_blocks=body.raw_blocks,
                 raw_main_block=body.raw_main_block,
             )
@@ -183,12 +180,42 @@ class MYWorksheetView(APIView):
         """
         worksheet id 에 해당되는 worksheet 를 삭제한다.
         """
-        worksheet = self.worksheet_use_case.fetch_process(worksheet_id=worksheet_id)
-        if worksheet.owner_id != token_payload.user_id:
-            return error_response(message="권한이 없습니다.")
+        try:
+            worksheet = self.worksheet_use_case.fetch_process(worksheet_id=worksheet_id)
+            if worksheet.owner_id != token_payload.user_id:
+                return error_response(message="권한이 없습니다.")
 
-        self.worksheet_use_case.delete_process(worksheet_id=worksheet_id)
+            self.worksheet_use_case.delete_process(worksheet_id=worksheet_id)
+
+        except WorksheetException as e:
+            if hasattr(e, "code"):
+                return error_response(code=e.code, message=str(e), status=400)
+            else:
+                return error_response(code="UNKNOWN_ERROR", message=str(e), status=400)
 
         return success_response(
             data="", message=f"worksheet id {worksheet_id}가 삭제되었소", status=200
+        )
+
+
+class WorksheetValidatorView(APIView):
+    def __init__(self, **kwargs: Any) -> None:
+        self.worksheet_use_case = WorksheetUseCase()
+
+    @dataclass
+    class BodyParams(BaseModel):
+        main_block: dict
+
+    @validate_body(BodyParams)
+    def post(self, request, body: BodyParams):
+        main_block_vo = MainBlock.from_dict(body.main_block)
+        result = self.worksheet_use_case.validate_worksheet(main_block=main_block_vo)
+        if result:
+            data = {"target": result, "is_valid": False}
+            return success_response(
+                message=f"존재하지않는 function을 참조하고있습니다", status=200, data=data
+            )
+
+        return success_response(
+            data={"target": result, "is_valid": True}, message=f"valid", status=200
         )

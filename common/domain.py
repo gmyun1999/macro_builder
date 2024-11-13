@@ -32,7 +32,7 @@ T = TypeVar("T")
 
 @dataclass
 class PagedResult(Generic[T]):
-    items: list[Any]
+    items: list[T]
     total_items: int
     total_pages: int
     current_page: int

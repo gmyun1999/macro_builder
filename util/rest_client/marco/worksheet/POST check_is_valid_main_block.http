@@ -1,3 +1,44 @@
-POST {{macro-host}}/worksheet/validate
+POST {{macro-host}}/worksheet/validate/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
+
+{
+      "main_block": {
+        "block_type": "MAIN_BLOCK",
+        "body": [
+          {
+            "block_type": "BASE_LOOP_BLOCK",
+            "iter_cnt": "2",
+            "body": [
+              {
+                "block_type": "BASE_LOOP_BLOCK",
+                "iter_cnt": "3",
+                "body": [
+                  {
+                    "block_type": "REFERENCE_BLOCK",
+                    "reference_id": "func_nested_1",
+                    "reference_function_name": "UnKnown"
+                  }
+                ]
+              },
+              {
+                "block_type": "BASE_LOOP_BLOCK",
+                "iter_cnt": "3",
+                "body": [
+                  {
+                    "block_type": "REFERENCE_BLOCK",
+                    "reference_id": "func_nested_2",
+                    "reference_function_name": "UnKnown"
+                  }
+                ]
+              },
+              {
+                "block_type": "REFERENCE_BLOCK",
+                "reference_id": "func_nested_3",
+                "reference_function_name": "UnKnown"
+              }
+            ]
+          }
+        ]
+      }
+}
