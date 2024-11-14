@@ -12,8 +12,15 @@ def success_response(
 
 
 def error_response(
-    code: str | None = None, message: str | None = None, status: int = 400
+    code: str | None = None,
+    message: str | None = None,
+    status: int = 400,
+    detail: list[dict] = [],
 ):
     return JsonResponse(
-        {"status": "error", "error": {"code": code, "message": message}}, status=status
+        {
+            "status": "error",
+            "error": {"code": code, "message": message, "detail": detail},
+        },
+        status=status,
     )

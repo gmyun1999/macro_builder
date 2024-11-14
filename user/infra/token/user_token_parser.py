@@ -18,22 +18,22 @@ class UserTokenParser(ITokenParser):
         self, token: str, validate_type: str, allowed_roles: list[str]
     ) -> tuple[UserTokenPayload | None, str]:
         if not token:
-            return None, response_msg.TokenMessage.NOT_FOUND
+            return None, response_msg.TokenMessage.NOT_FOUND.value
 
         try:
             payload = self.decode_token(token)
 
             if payload[UserTokenPayload.FIELD_TYPE] != validate_type:
-                return None, response_msg.TokenMessage.WRONG_TYPE
+                return None, response_msg.TokenMessage.WRONG_TYPE.value
 
             if not payload[UserTokenPayload.FIELD_ROLE] in allowed_roles:
-                return None, response_msg.TokenMessage.ROLE_NO_PERMISSION
+                return None, response_msg.TokenMessage.ROLE_NO_PERMISSION.value
 
             user_token_payload_vo = UserTokenPayload.from_dict(payload)
-            return user_token_payload_vo, response_msg.TokenMessage.VALID
+            return user_token_payload_vo, response_msg.TokenMessage.VALID.value
 
         except jwt.ExpiredSignatureError:
-            return None, response_msg.TokenMessage.EXPIRED
+            return None, response_msg.TokenMessage.EXPIRED.value
 
     def check_token(
         self, token: str, allowed_roles: list[str], validate_type: str

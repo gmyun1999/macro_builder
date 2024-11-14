@@ -1,7 +1,7 @@
 class PagingException(Exception):
     """페이징 관련 예외 클래스."""
 
-    pass
+    code = "UNKNOWN_PAGING_ERROR"
 
 
 class InvalidPagingParameterException(PagingException):

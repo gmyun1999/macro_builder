@@ -12,7 +12,10 @@ from common.interface.validators import validate_body, validate_query_params
 from common.service.token.exception import PagingException
 from macro_sheet.domain.block.base_block.main_block import MainBlock
 from macro_sheet.domain.block.block import Block
-from macro_sheet.service.exception.exceptions import WorksheetException
+from macro_sheet.service.exception.exceptions import (
+    FunctionException,
+    WorksheetException,
+)
 from macro_sheet.service.i_repo.i_worksheet_repo import IWorksheetRepo
 from macro_sheet.usecase.worksheet_usecase import WorksheetUseCase
 from user.domain.user_token import UserTokenPayload
@@ -99,7 +102,17 @@ class MYWorksheetView(APIView):
             if hasattr(e, "code"):
                 return error_response(code=e.code, message=str(e), status=400)
             else:
-                return error_response(code="UNKNOWN_ERROR", message=str(e), status=400)
+                return error_response(
+                    code="UNKNOWN_WORKSHEET_ERROR", message=str(e), status=400
+                )
+
+        except FunctionException as e:
+            if hasattr(e, "code"):
+                return error_response(code=e.code, message=str(e), status=400)
+            else:
+                return error_response(
+                    code="UNKNOWN_FUNCTION_ERROR", message=str(e), status=400
+                )
 
         if worksheet.owner_id != token_payload.user_id:
             return error_response(message="권한이 없습니다.")
@@ -135,7 +148,17 @@ class MYWorksheetView(APIView):
             if hasattr(e, "code"):
                 return error_response(code=e.code, message=str(e), status=400)
             else:
-                return error_response(code="UNKNOWN_ERROR", message=str(e), status=400)
+                return error_response(
+                    code="UNKNOWN_WORKSHEET_ERROR", message=str(e), status=400
+                )
+
+        except FunctionException as e:
+            if hasattr(e, "code"):
+                return error_response(code=e.code, message=str(e), status=400)
+            else:
+                return error_response(
+                    code="UNKNOWN_FUNCTION_ERROR", message=str(e), status=400
+                )
 
     @validate_token()
     @validate_body(UpdateBodyParams)
@@ -173,7 +196,17 @@ class MYWorksheetView(APIView):
             if hasattr(e, "code"):
                 return error_response(code=e.code, message=str(e), status=400)
             else:
-                return error_response(code="UNKNOWN_ERROR", message=str(e), status=400)
+                return error_response(
+                    code="UNKNOWN_WORKSHEET_ERROR", message=str(e), status=400
+                )
+
+        except FunctionException as e:
+            if hasattr(e, "code"):
+                return error_response(code=e.code, message=str(e), status=400)
+            else:
+                return error_response(
+                    code="UNKNOWN_FUNCTION_ERROR", message=str(e), status=400
+                )
 
     @validate_token()
     def delete(self, request, worksheet_id: str, token_payload: UserTokenPayload):
@@ -188,10 +221,17 @@ class MYWorksheetView(APIView):
             self.worksheet_use_case.delete_process(worksheet_id=worksheet_id)
 
         except WorksheetException as e:
+            return error_response(
+                code=e.code, detail=e.detail, message=str(e), status=400
+            )
+
+        except FunctionException as e:
             if hasattr(e, "code"):
                 return error_response(code=e.code, message=str(e), status=400)
             else:
-                return error_response(code="UNKNOWN_ERROR", message=str(e), status=400)
+                return error_response(
+                    code="UNKNOWN_FUNCTION_ERROR", message=str(e), status=400
+                )
 
         return success_response(
             data="", message=f"worksheet id {worksheet_id}가 삭제되었소", status=200
