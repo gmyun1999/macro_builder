@@ -1,5 +1,30 @@
-POST {{macro-host}}/me/function
+POST {{macro-host}}/me/function/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
-# function을 생성한다.
+# 백엔드 예외처리: reference block 이 있을경우 존재하는지 체크함
+# POST {{macro-host}}/me/function/
+{
+    "name" : "test_function3123",
+    "blocks" : [
+        {
+                "block_type": "BASE_LOOP_BLOCK",
+                "iter_cnt": "3",
+                "body": [
+
+                  {
+                    "block_type": "FILE_SYSTEM_BLOCK",
+                    "target": "FILE",
+                    "action": "MOVE",
+                    "loc": "/C/user/downloads/",
+                    "condition": [
+                      { "FILE_NAME_ENDSWITH": "_old" }
+                    ],
+                    "destination": "/C/user/old_downloads/",
+                    "rename": null
+                  }
+                ]
+              }
+    ],
+    "raw_blocks" : []
+}

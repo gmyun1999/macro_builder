@@ -15,7 +15,7 @@ class BlockFunctionService:
     def update_block_function_with_closure_function(
         self,
         block_function_obj: BlockFunction,
-        new_parent_function_ids: list[str] | None = None,
+        new_parent_function_ids: list[str],
     ) -> BlockFunction:
         """
         블록 함수와 그에 따른 클로저 관계를 업데이트합니다.

@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "user",
     "macro_sheet",
     "django_extensions",
+    "django_cte",
 ]
 
 MIDDLEWARE = [

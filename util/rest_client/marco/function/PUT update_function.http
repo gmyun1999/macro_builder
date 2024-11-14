@@ -1,5 +1,17 @@
-PUT {{macro-host}}/me/function/1
+PUT {{macro-host}}/me/function/c11a7da4-41ba-4947-a788-9b5398206d9b/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
-# function 1을 update 한다.
+# 백엔드 예외처리: reference block 이 있을경우 존재하는지와, 순환참조, 재귀 등을 체크함.
+# PUT {{macro-host}}/me/function/<str: function_id>/
+{
+    "name" : "change_name",
+    "blocks" : [
+                          {
+                    "block_type": "REFERENCE_BLOCK",
+                    "reference_id": "c11a7da4-41ba-4947-a788-9b5398206d9b",
+                    "reference_function_name": "UnKnown"
+                  }
+    ],
+    "raw_blocks" : []
+}

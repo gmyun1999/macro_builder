@@ -1,9 +1,8 @@
 # macro_sheet/infra/repo/block_function_repo.py
-from typing import List, Optional
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 
+from macro_sheet.domain.block.block import Block
 from macro_sheet.domain.Function.block_function import BlockFunction as BlockFunctionVo
 from macro_sheet.infra.models import Function
 from macro_sheet.service.i_repo.i_block_function_repo import IBlockFunctionRepo
@@ -12,7 +11,7 @@ from macro_sheet.service.i_repo.i_block_function_repo import IBlockFunctionRepo
 class BlockFunctionRepo(IBlockFunctionRepo):
     def fetch_function(
         self, filter: IBlockFunctionRepo.Filter
-    ) -> List[BlockFunctionVo]:
+    ) -> list[BlockFunctionVo]:
         queryset = Function.objects.all()
         if filter.owner_id is not None:
             queryset = queryset.filter(owner_id=filter.owner_id)
@@ -25,7 +24,8 @@ class BlockFunctionRepo(IBlockFunctionRepo):
                 id=str(func.id),
                 owner_id=str(func.owner_id),
                 name=func.name,
-                blocks=func.blocks,
+                blocks=[Block.from_dict(block) for block in func.blocks],
+                raw_blocks=func.raw_blocks,
             )
             for func in functions
         ]
@@ -33,16 +33,22 @@ class BlockFunctionRepo(IBlockFunctionRepo):
     def create_function(self, block_function_obj: BlockFunctionVo) -> BlockFunctionVo:
         try:
             with transaction.atomic():
+                block_function_obj.blocks
+                blocks = [block.to_dict() for block in block_function_obj.blocks]
+
                 function = Function.objects.create(
+                    id=block_function_obj.id,
                     owner_id=block_function_obj.owner_id,
                     name=block_function_obj.name,
-                    blocks=block_function_obj.blocks,
+                    blocks=blocks,
+                    raw_blocks=block_function_obj.raw_blocks,
                 )
                 return BlockFunctionVo(
                     id=str(function.id),
                     owner_id=str(function.owner_id),
                     name=function.name,
                     blocks=function.blocks,
+                    raw_blocks=function.raw_blocks,
                 )
 
         except Exception as e:
@@ -51,16 +57,16 @@ class BlockFunctionRepo(IBlockFunctionRepo):
     def update_function(self, block_function_obj: BlockFunctionVo) -> BlockFunctionVo:
         try:
             with transaction.atomic():
+                block_function_obj.blocks
+                blocks = [block.to_dict() for block in block_function_obj.blocks]
+
                 function = Function.objects.get(id=block_function_obj.id)
                 function.name = block_function_obj.name
-                function.blocks = block_function_obj.blocks
+                function.blocks = blocks
+                function.raw_blocks = block_function_obj.raw_blocks
                 function.save()
-                return BlockFunctionVo(
-                    id=str(function.id),
-                    owner_id=str(function.owner_id),
-                    name=function.name,
-                    blocks=function.blocks,
-                )
+
+                return block_function_obj
 
         except ObjectDoesNotExist:
             raise ValueError("수정하려는 함수가 존재하지 않습니다.")

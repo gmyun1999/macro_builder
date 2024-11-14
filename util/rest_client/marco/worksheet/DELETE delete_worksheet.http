@@ -2,4 +2,5 @@ DELETE {{macro-host}}/me/worksheet/91f9b47c-5375-4cc0-a55a-c25e70f0f8bd/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
-#id f020c8f0-e34f-4397-8d25-587733703ab2인 worksheet 삭제
+# DELETE {{macro-host}}/me/worksheet/<str: worksheet_id>/
+# 백엔드 예외처리: worksheet_id가 본인꺼가 맞는지 체크하고, 존재하는지 체크함.

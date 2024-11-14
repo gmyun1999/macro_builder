@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django_cte import CTEManager
 
 from user.infra.models.user import User
 
@@ -16,6 +17,7 @@ class Function(models.Model):
     )
     name = models.CharField(max_length=255)
     blocks = models.JSONField(default=list)
+    raw_blocks = models.JSONField(default=list)
 
     class Meta:
         db_table = "Function"
@@ -77,6 +79,8 @@ class FunctionHierarchy(models.Model):
     child = models.ForeignKey(
         Function, related_name="child", on_delete=models.CASCADE, db_constraint=False
     )
+
+    objects = CTEManager()
 
     class Meta:
         db_table = "FunctionHierarchy"

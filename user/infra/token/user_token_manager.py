@@ -21,6 +21,15 @@ class UserTokenManager(ITokenManager):
         )
         return self._create_user_token(user_payload_vo=payload)
 
+    def create_guest_access_token(self, guest_id: str) -> str:
+        payload = self._create_user_token_payload(
+            guest_id=guest_id,
+            role=UserRole.GUEST,
+            type=UserTokenType.REFRESH,
+            seconds=UserTokenExp.REFRESH_EXP,
+        )
+        return self._create_user_token(user_payload_vo=payload)
+
     def create_admin_refresh_token(self, admin_id: str) -> str:
         payload = self._create_user_token_payload(
             admin_id=admin_id,
@@ -52,6 +61,7 @@ class UserTokenManager(ITokenManager):
         self,
         user_id: str | None = None,
         admin_id: str | None = None,
+        guest_id: str | None = None,
         role: UserRole = UserRole.USER,
         type: str = UserTokenType.ACCESS,
         seconds: int = UserTokenExp.ACCESS_EXP,
@@ -59,6 +69,7 @@ class UserTokenManager(ITokenManager):
         return UserTokenPayload(
             admin_id=admin_id,
             user_id=user_id,
+            guest_id=guest_id,
             role=role,
             type=type,
             exp=int((datetime.now() + timedelta(seconds=seconds)).timestamp()),  # 만료시간

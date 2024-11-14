@@ -1,25 +1,19 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Literal
 
-from django.http import JsonResponse
 from pydantic import BaseModel, Field
-from rest_framework import status
 from rest_framework.views import APIView
 
-from common.domain import PagedResult
 from common.interface.response import error_response, success_response
 from common.interface.validators import validate_body, validate_query_params
-from common.response_msg import TokenMessage
 from common.service.token.exception import PagingException
-from macro_sheet.domain.block.base_block.main_block import MainBlock
 from macro_sheet.domain.block.block import Block
 from macro_sheet.service.exception.exceptions import (
     FunctionException,
-    WorksheetException,
+    FunctionHasChildrenException,
 )
-from macro_sheet.service.i_repo.i_worksheet_repo import IWorksheetRepo
 from macro_sheet.usecase.block_function_usecase import BlockFunctionUseCase
-from macro_sheet.usecase.worksheet_usecase import WorksheetUseCase
+from user.domain.user_role import UserRoles
 from user.domain.user_token import UserTokenPayload
 from user.interface.validator.user_token_validator import validate_token
 
@@ -37,7 +31,7 @@ class GETMyFunctionListView(APIView):
     def __init__(self):
         self.function_use_case = BlockFunctionUseCase()
 
-    @validate_token()
+    @validate_token(roles=UserRoles.USER_ROLES)
     @validate_query_params(QueryParams)
     def get(self, request, token_payload: UserTokenPayload, params: QueryParams):
         user_id: str = token_payload.user_id  # type: ignore
@@ -62,3 +56,184 @@ class GETMyFunctionListView(APIView):
 
         except PagingException as e:
             return error_response(code=e.code, message=str(e), status=400)
+
+
+class MYBlockFunctionView(APIView):
+    """
+    user 토큰을 까서 해당 유저의 function 관련 view
+    """
+
+    class CreateBodyParams(BaseModel):
+        name: str = Field(default="unknown", max_length=255)
+        blocks: list
+        raw_blocks: list
+
+    class UpdateBodyParams(BaseModel):
+        name: str = Field(default="unknown", max_length=255)
+        blocks: list
+        raw_blocks: list
+
+    class DeleteQueryParams(BaseModel):
+        mode: Literal["safe", "simple"] = "safe"
+
+    def __init__(self):
+        self.block_function_use_case = BlockFunctionUseCase()
+
+    @validate_token(roles=UserRoles.USER_ROLES)
+    def get(self, request, function_id: str, token_payload: UserTokenPayload):
+        """
+        넘겨준 function_id 에 해당되는 내용을 반환
+        """
+        try:
+            function = self.block_function_use_case.fetch_process(
+                function_id=function_id
+            )
+
+        except FunctionException as e:
+            return error_response(
+                code=e.code, message=str(e), status=400, detail=e.detail
+            )
+
+        if function.owner_id != token_payload.user_id:
+            return error_response(message="권한이 없습니다.")
+
+        dicted_function = function.to_dict()
+        return success_response(
+            data=dicted_function, message="성공적인 fetch올시다", status=200
+        )
+
+    @validate_token(roles=UserRoles.USER_ROLES)
+    @validate_body(CreateBodyParams)
+    def post(self, request, token_payload: UserTokenPayload, body: CreateBodyParams):
+        """
+        block function 생성.
+        """
+        try:
+            blocks_vo = [Block.from_dict(block) for block in body.blocks]
+            function = self.block_function_use_case.create_process(
+                owner_id=token_payload.user_id,  # type: ignore
+                name=body.name,
+                blocks=blocks_vo,
+                raw_blocks=body.raw_blocks,
+            )
+
+            return success_response(
+                data="", message=f"function id {function.id}가 생성되었소", status=201
+            )
+
+        except FunctionException as e:
+            return error_response(
+                code=e.code, message=str(e), status=400, detail=e.detail
+            )
+
+        except (ValueError, AttributeError) as e:
+            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+
+    @validate_token(roles=UserRoles.USER_ROLES)
+    @validate_body(UpdateBodyParams)
+    def put(
+        self,
+        request,
+        function_id: str,
+        token_payload: UserTokenPayload,
+        body: UpdateBodyParams,
+    ):
+        """
+        worksheet id 에 해당되는 worksheet 를 수정한다.
+        """
+        try:
+            block_function = self.block_function_use_case.fetch_process(
+                function_id=function_id
+            )
+
+            if block_function.owner_id != token_payload.user_id:
+                return error_response(message="권한이 없습니다.")
+
+            blocks_vo = [Block.from_dict(block) for block in body.blocks]
+
+            self.block_function_use_case.update_process(
+                function_id=function_id,
+                owner_id=token_payload.user_id,
+                name=body.name,
+                raw_blocks=body.raw_blocks,
+                blocks=blocks_vo,
+            )
+
+            return success_response(
+                data="", message=f"block function id {function_id}가 변경되었소", status=200
+            )
+
+        except FunctionException as e:
+            return error_response(
+                code=e.code, message=str(e), status=400, detail=e.detail
+            )
+
+        except (ValueError, AttributeError) as e:
+            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+
+    @validate_token(roles=UserRoles.USER_ROLES)
+    @validate_query_params(DeleteQueryParams)
+    def delete(
+        self,
+        request,
+        function_id: str,
+        token_payload: UserTokenPayload,
+        params: DeleteQueryParams,
+    ):
+        """
+        worksheet id 에 해당되는 worksheet 를 삭제한다.
+        """
+        try:
+            worksheet = self.block_function_use_case.fetch_process(
+                function_id=function_id
+            )
+            if worksheet.owner_id != token_payload.user_id:
+                return error_response(message="권한이 없습니다.")
+            if params.mode == "simple":
+                self.block_function_use_case.delete_process(function_id=function_id)
+
+            if params.mode == "safe":
+                self.block_function_use_case.safety_delete_process(
+                    function_id=function_id
+                )
+
+            return success_response(
+                data="", message=f"block function id {function_id}가 삭제되었소", status=200
+            )
+
+        except FunctionHasChildrenException as e:
+            return error_response(
+                code=e.code, message=str(e), status=409, detail=e.detail
+            )
+
+        except FunctionException as e:
+            return error_response(
+                code=e.code, message=str(e), status=400, detail=e.detail
+            )
+
+
+class FunctionValidatorView(APIView):
+    def __init__(self) -> None:
+        self.function_use_case = BlockFunctionUseCase()
+
+    @dataclass
+    class BodyParams(BaseModel):
+        blocks: list
+        raw_blocks: list
+        name: str = Field(default="unknown", max_length=255)
+
+    @validate_token(roles=UserRoles.ALL_USER_ROLES)
+    @validate_body(BodyParams)
+    def post(self, request, token_payload: UserTokenPayload, body: BodyParams):
+        # TODO: 뭔가 나중에 user, guest 에 따라서 validate를 다르게 할수있을듯.
+        blocks_vo = [Block.from_dict(block) for block in body.blocks]
+        result = self.function_use_case.validate_function(blocks=blocks_vo)
+        if result:
+            data = {"target": result, "is_valid": False}
+            return success_response(
+                message=f"존재하지않는 function을 참조하고있습니다", status=200, data=data
+            )
+
+        return success_response(
+            data={"target": result, "is_valid": True}, message=f"valid", status=200
+        )

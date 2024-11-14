@@ -18,6 +18,7 @@ from macro_sheet.service.exception.exceptions import (
 )
 from macro_sheet.service.i_repo.i_worksheet_repo import IWorksheetRepo
 from macro_sheet.usecase.worksheet_usecase import WorksheetUseCase
+from user.domain.user_role import UserRoles
 from user.domain.user_token import UserTokenPayload
 from user.interface.validator.user_token_validator import validate_token
 
@@ -35,7 +36,7 @@ class GETMyWorksheetListView(APIView):
     def __init__(self):
         self.worksheet_use_case = WorksheetUseCase()
 
-    @validate_token()
+    @validate_token(roles=UserRoles.USER_ROLES)
     @validate_query_params(QueryParams)
     def get(self, request, token_payload: UserTokenPayload, params: QueryParams):
         user_id = token_payload.user_id
@@ -90,7 +91,7 @@ class MYWorksheetView(APIView):
     def __init__(self):
         self.worksheet_use_case = WorksheetUseCase()
 
-    @validate_token()
+    @validate_token(roles=UserRoles.USER_ROLES)
     def get(self, request, worksheet_id: str, token_payload: UserTokenPayload):
         """
         넘겨준 worksheet_id 에 해당되는 내용을 반환
@@ -99,20 +100,10 @@ class MYWorksheetView(APIView):
             worksheet = self.worksheet_use_case.fetch_process(worksheet_id=worksheet_id)
 
         except WorksheetException as e:
-            if hasattr(e, "code"):
-                return error_response(code=e.code, message=str(e), status=400)
-            else:
-                return error_response(
-                    code="UNKNOWN_WORKSHEET_ERROR", message=str(e), status=400
-                )
+            return error_response(code=e.code, message=str(e), status=400)
 
         except FunctionException as e:
-            if hasattr(e, "code"):
-                return error_response(code=e.code, message=str(e), status=400)
-            else:
-                return error_response(
-                    code="UNKNOWN_FUNCTION_ERROR", message=str(e), status=400
-                )
+            return error_response(code=e.code, message=str(e), status=400)
 
         if worksheet.owner_id != token_payload.user_id:
             return error_response(message="권한이 없습니다.")
@@ -122,7 +113,7 @@ class MYWorksheetView(APIView):
             data=dicted_worksheet, message="성공적인 fetch올시다", status=200
         )
 
-    @validate_token()
+    @validate_token(roles=UserRoles.USER_ROLES)
     @validate_body(CreateBodyParams)
     def post(self, request, token_payload: UserTokenPayload, body: CreateBodyParams):
         """
@@ -145,22 +136,15 @@ class MYWorksheetView(APIView):
             )
 
         except WorksheetException as e:
-            if hasattr(e, "code"):
-                return error_response(code=e.code, message=str(e), status=400)
-            else:
-                return error_response(
-                    code="UNKNOWN_WORKSHEET_ERROR", message=str(e), status=400
-                )
+            return error_response(code=e.code, message=str(e), status=400)
 
         except FunctionException as e:
-            if hasattr(e, "code"):
-                return error_response(code=e.code, message=str(e), status=400)
-            else:
-                return error_response(
-                    code="UNKNOWN_FUNCTION_ERROR", message=str(e), status=400
-                )
+            return error_response(code=e.code, message=str(e), status=400)
 
-    @validate_token()
+        except (ValueError, AttributeError) as e:
+            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+
+    @validate_token(roles=UserRoles.USER_ROLES)
     @validate_body(UpdateBodyParams)
     def put(
         self,
@@ -193,22 +177,19 @@ class MYWorksheetView(APIView):
                 data="", message=f"worksheet id {worksheet_id}가 변경되었소", status=200
             )
         except WorksheetException as e:
-            if hasattr(e, "code"):
-                return error_response(code=e.code, message=str(e), status=400)
-            else:
-                return error_response(
-                    code="UNKNOWN_WORKSHEET_ERROR", message=str(e), status=400
-                )
+            return error_response(
+                code=e.code, message=str(e), status=400, detail=e.detail
+            )
 
         except FunctionException as e:
-            if hasattr(e, "code"):
-                return error_response(code=e.code, message=str(e), status=400)
-            else:
-                return error_response(
-                    code="UNKNOWN_FUNCTION_ERROR", message=str(e), status=400
-                )
+            return error_response(
+                code=e.code, message=str(e), status=400, detail=e.detail
+            )
 
-    @validate_token()
+        except (ValueError, AttributeError) as e:
+            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+
+    @validate_token(roles=UserRoles.USER_ROLES)
     def delete(self, request, worksheet_id: str, token_payload: UserTokenPayload):
         """
         worksheet id 에 해당되는 worksheet 를 삭제한다.
@@ -226,12 +207,12 @@ class MYWorksheetView(APIView):
             )
 
         except FunctionException as e:
-            if hasattr(e, "code"):
-                return error_response(code=e.code, message=str(e), status=400)
-            else:
-                return error_response(
-                    code="UNKNOWN_FUNCTION_ERROR", message=str(e), status=400
-                )
+            return error_response(
+                code=e.code, message=str(e), status=400, detail=e.detail
+            )
+
+        except (ValueError, AttributeError) as e:
+            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
 
         return success_response(
             data="", message=f"worksheet id {worksheet_id}가 삭제되었소", status=200
@@ -246,9 +227,15 @@ class WorksheetValidatorView(APIView):
     class BodyParams(BaseModel):
         main_block: dict
 
+    @validate_token(roles=UserRoles.ALL_USER_ROLES)
     @validate_body(BodyParams)
-    def post(self, request, body: BodyParams):
-        main_block_vo = MainBlock.from_dict(body.main_block)
+    def post(self, request, token_payload: UserTokenPayload, body: BodyParams):
+        try:
+            main_block_vo = MainBlock.from_dict(body.main_block)
+
+        except (ValueError, AttributeError) as e:
+            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+
         result = self.worksheet_use_case.validate_worksheet(main_block=main_block_vo)
         if result:
             data = {"target": result, "is_valid": False}

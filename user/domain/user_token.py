@@ -19,6 +19,7 @@ class UserTokenExp(IntEnum):
 class UserTokenPayload(Domain):
     FIELD_ADMIN_ID = "admin_id"
     FIELD_USER_ID = "user_id"
+    FIELD_GUEST_ID = "guest_id"
     FIELD_TYPE = "type"
     FIELD_ROLE = "role"
     FIELD_EXP = "exp"
@@ -26,6 +27,7 @@ class UserTokenPayload(Domain):
 
     admin_id: str | None
     user_id: str | None
+    guest_id: str | None
     type: str
     role: str
     exp: int  # 만료시간

@@ -1,7 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.db.models import F, IntegerField, Q, Value
-from django.db.models.functions import Cast
+from django.db.models import OuterRef, Q, Subquery
 from django_cte import With
 
 from macro_sheet.infra.models import Function, FunctionHierarchy
@@ -74,20 +73,39 @@ class FunctionClosureRepo(IFunctionClosureRepo):
                 raise ValueError("일부 FunctionClosure 관계가 존재하지 않거나 삭제되지 않았습니다.")
 
     def get_all_ancestors(self, root_function_id: str) -> list[str]:
-        """주어진 함수의 모든 상위 함수 ID를 조회합니다."""
-        # 초기 CTE 정의 - root_function_id를 기준으로 직접 부모들 찾기
-        ancestors_cte = With(
-            FunctionHierarchy.objects.filter(child_id=root_function_id)
-            .values("parent_id")
-            .annotate(child_id=Cast(Value(root_function_id), IntegerField()))
+        """
+        Queryset.raw()를 사용하여 SQL Injection에 안전한 방식으로 모든 조상들을 조회합니다.
+
+        Args:
+            root_function_id (str): 조상을 찾고자 하는 function의 ID
+
+        Returns:
+            list[str]: 모든 조상 function들의 ID 목록
+        """
+        query = """
+            WITH RECURSIVE ancestors AS (
+                -- 초기 부모들을 선택 (base case)
+                SELECT id, parent_id, child_id, 1 as depth
+                FROM "FunctionHierarchy"
+                WHERE child_id = %(root_id)s
+                
+                UNION ALL
+                
+                -- 재귀적으로 상위 부모들을 선택
+                SELECT fh.id, fh.parent_id, fh.child_id, a.depth + 1
+                FROM "FunctionHierarchy" fh
+                INNER JOIN ancestors a ON fh.child_id = a.parent_id
+            )
+            SELECT DISTINCT fh.id, fh.parent_id, fh.child_id
+            FROM "FunctionHierarchy" fh
+            JOIN ancestors a ON fh.id = a.id
+            ORDER BY fh.parent_id;
+        """
+
+        # Queryset.raw()는 SQL Injection에 안전한 파라미터 바인딩을 제공합니다
+        queryset = FunctionHierarchy.objects.raw(
+            query, params={"root_id": root_function_id}
         )
 
-        # CTE를 사용하여 모든 상위 함수들을 재귀적으로 검색
-        all_ancestors = (
-            ancestors_cte.join(FunctionHierarchy, child_id=ancestors_cte.col.parent_id)
-            .with_cte(ancestors_cte)
-            .values_list("parent_id", flat=True)
-            .distinct()  # 중복 제거
-        )
-
-        return list(all_ancestors)
+        # parent_id 값들만 리스트로 변환하여 반환
+        return list(set(obj.parent_id for obj in queryset))

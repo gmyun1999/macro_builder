@@ -37,6 +37,8 @@ class WorksheetUseCase:
         """
         사용자가 워크시트를 수정한 다음 저장할 때
         """
+        # TODO: function_id 만 알면 쓸수있는데, permission을 걸어채워야할듯.
+
         if owner_id is None:
             raise NotLoggedInException()
 
@@ -76,6 +78,7 @@ class WorksheetUseCase:
         """
         사용자가 처음 워크시트를 생성하고 저장할 때
         """
+        # TODO: function_id 만 알면 쓸수있는데, permission을 걸어채워야할듯.
         if owner_id is None:
             raise NotLoggedInException()
 

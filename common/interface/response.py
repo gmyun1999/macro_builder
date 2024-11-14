@@ -15,7 +15,7 @@ def error_response(
     code: str | None = None,
     message: str | None = None,
     status: int = 400,
-    detail: list[dict] = [],
+    detail: dict = {},
 ):
     return JsonResponse(
         {

@@ -1,3 +1,10 @@
-GET {{macro-host}}/me/worksheets/?page=1&size=20
+GET {{macro-host}}/me/worksheets/?page=3&size=20
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
+
+
+
+# 쿼리파람은 page, page_size 2개가있음.
+# GET {{macro-host}}/me/worksheets/?page=2&page_size=20
+# 만약 page_size를 주지않는다면 default 10이고 , page 의 경우 1이다.
+# 백엔드 예외처리: user token 외에, page가 이상하거나(ex page=-1 등), page_size가 100이 넘어갈경우 

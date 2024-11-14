@@ -1,5 +1,36 @@
-POST {{macro-host}}/function/validate
+POST {{macro-host}}/function/validate/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
-# function이 validate 한지를 check 한다.
+# function이 validate 한지를 check 한다. 우선은 function_id 가 존재하는지만 체크한다.(delete 될때 없어진 id 체크용)
+# 왜냐면 해당 function이 update 용인지, create 용인지 알수없을 뿐더러 이를 추적하는것은 쉽지않기때문에
+# 순환참조나, 재귀등의 에외처리는 function을 저장하거나, update 할때 체크한다.
+
+{
+    "name" : "test_function3123",
+    "blocks" : [
+        {
+            "block_type": "BASE_LOOP_BLOCK",
+            "iter_cnt": "3",
+            "body": [
+                {
+                    "block_type": "REFERENCE_BLOCK",
+                    "reference_id": "c11a7da4-41ba-4947-a788-9b5398206d9bㅇ",
+                    "reference_function_name": "UnKnown"
+                },
+                {
+                    "block_type": "FILE_SYSTEM_BLOCK",
+                    "target": "FILE",
+                    "action": "MOVE",
+                    "loc": "/C/user/downloads/",
+                    "condition": [
+                        { "FILE_NAME_ENDSWITH": "_old" }
+                    ],
+                    "destination": "/C/user/old_downloads/",
+                    "rename": null
+                }
+            ]
+        }
+    ],
+    "raw_blocks" : []
+}

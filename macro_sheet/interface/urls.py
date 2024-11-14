@@ -1,6 +1,10 @@
 from django.urls import path
 
-from macro_sheet.interface.view.function_view import GETMyFunctionListView
+from macro_sheet.interface.view.function_view import (
+    FunctionValidatorView,
+    GETMyFunctionListView,
+    MYBlockFunctionView,
+)
 from macro_sheet.interface.view.worksheet_view import (
     GETMyWorksheetListView,
     MYWorksheetView,
@@ -14,9 +18,17 @@ urlpatterns = [
         view=WorksheetValidatorView.as_view(),
         name="validate_worksheet",
     ),
-    path("function/validate/", view=TestView.as_view(), name="test"),
-    path("me/function/<str:function_id>/", view=TestView.as_view(), name="test"),
-    path("me/function/", view=TestView.as_view(), name="test"),
+    path(
+        "function/validate/",
+        view=FunctionValidatorView.as_view(),
+        name="function_validate",
+    ),
+    path(
+        "me/function/<str:function_id>/",
+        view=MYBlockFunctionView.as_view(),
+        name="my_function",
+    ),
+    path("me/function/", view=MYBlockFunctionView.as_view(), name="my_function"),
     path(
         "me/functions/",
         view=GETMyFunctionListView.as_view(),

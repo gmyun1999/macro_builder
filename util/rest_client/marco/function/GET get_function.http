@@ -1,6 +1,7 @@
-GET {{macro-host}}/me/function/1
+GET {{macro-host}}/me/function/45c52d4b-366a-4bca-ba8b-d5b65423ec07/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
 
-# 나의 function 중 id 가 1인거 fetch
+# GET {{macro-host}}/me/function/<str: function_id>
+# 백엔드 예외처리: function_id가 존재하는지 확인함, function_id의 주인이 본인인지를 확인함.

@@ -1,0 +1,6 @@
+DELETE {{macro-host}}/me/function/b03c7294-1f68-459d-8c7b-1f9e1f234a29/
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+# DELETE {{macro-host}}/me/function/<str: function_id>?mode=safe
+# mode값을 주지않거나 "safe" 로 줄경우에는 자식이 있는지 확인하고 자식이 있다면 삭제하지않고, 어떤 자식을 가지는지 반환해준다.

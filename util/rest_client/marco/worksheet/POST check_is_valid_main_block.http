@@ -2,6 +2,7 @@ POST {{macro-host}}/worksheet/validate/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
+# 백엔드 예외처리: 현재로써는 reference block 이 있는경우 해당 id 가 존재하는지 확인함.
 {
       "main_block": {
         "block_type": "MAIN_BLOCK",
@@ -16,7 +17,7 @@ Authorization: Bearer {{macro-jwt}}
                 "body": [
                   {
                     "block_type": "REFERENCE_BLOCK",
-                    "reference_id": "func_nested_1",
+                    "reference_id": "b03c7294-1f68-459d-8c7b-1f9e1f234a29",
                     "reference_function_name": "UnKnown"
                   }
                 ]
@@ -27,14 +28,14 @@ Authorization: Bearer {{macro-jwt}}
                 "body": [
                   {
                     "block_type": "REFERENCE_BLOCK",
-                    "reference_id": "func_nested_2",
+                    "reference_id": "c11a7da4-41ba-4947-a788-9b5398206d9b",
                     "reference_function_name": "UnKnown"
                   }
                 ]
               },
               {
                 "block_type": "REFERENCE_BLOCK",
-                "reference_id": "func_nested_3",
+                "reference_id": "de7e63ca-8315-4595-9f6e-f4652b322821",
                 "reference_function_name": "UnKnown"
               }
             ]

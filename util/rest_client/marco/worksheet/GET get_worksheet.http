@@ -3,4 +3,5 @@ Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
 
-# id 가 d5ddc5de-fb93-4607-ad4e-d720891ea918인, worksheet 가져오기
+# GET {{macro-host}}/me/worksheet/<str: worksheet_id>/
+# 백엔드 예외처리: worksheet_id가 본인꺼가 맞는지 체크하고, 존재하는지 체크함.

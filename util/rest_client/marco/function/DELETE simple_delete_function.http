@@ -1,0 +1,6 @@
+DELETE {{macro-host}}/me/function/b03c7294-1f68-459d-8c7b-1f9e1f234a29?mode=simple
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}
+
+# DELETE {{macro-host}}/me/function/<str: function_id>?mode=simple
+# mode=simple 으로 하면 자식이 있는지의 여부와 관계없이 그냥 삭제해버림
