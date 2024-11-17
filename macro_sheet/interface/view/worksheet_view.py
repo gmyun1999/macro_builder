@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from django.http import JsonResponse
 from pydantic import BaseModel, Field
-from rest_framework import status
 from rest_framework.views import APIView
 
 from common.domain import PagedResult

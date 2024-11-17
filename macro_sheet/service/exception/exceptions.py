@@ -88,3 +88,39 @@ class FunctionHasChildrenException(FunctionException):
     ):
         self.function_id = function_id
         super().__init__(f"{message} (Function ID: {function_id})", detail)
+
+
+class GenerateGuiException(Exception):
+    """gui 생성 관련 기본 예외 클래스."""
+
+    code = "GUI_GENERATE_ERROR"
+
+    def __init__(self, message: str = "gui 생성관련 오류가 발생했습니다.", detail: dict = {}):
+        super().__init__(message)
+        self.detail = detail
+
+
+class MainBlockEmptyException(GenerateGuiException):
+    """함수를 삭제할떄 이함수를 참조하는 자식함수들이 있을때 예외"""
+
+    code = "MAIN_BLOCK_EMPTY"
+
+    def __init__(
+        self,
+        message: str = "main block은 비어있을수없습니다",
+        detail: dict = {},
+    ):
+        super().__init__(message, detail)
+
+
+class DownloadLinkNotFoundException(GenerateGuiException):
+    """gui 스토리지 link가 오지않았을때 예외"""
+
+    code = "GUI_LINK_NOT_FOUND"
+
+    def __init__(
+        self,
+        message: str = "gui link가 오지않았음",
+        detail: dict = {},
+    ):
+        super().__init__(message, detail)

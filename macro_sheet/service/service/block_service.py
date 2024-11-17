@@ -131,17 +131,14 @@ class BlockService:
         return f"{indent_str}{reference_id}()"
 
     def generate_script_from_worksheet(
-        self, worksheet: Worksheet, block_functions: list[BlockFunction]
+        self, main_block: MainBlock, block_functions: list[BlockFunction]
     ) -> str:
         """
         Generates the full Python script from the worksheet and block functions.
         """
         self.generated_functions = {}
         commands = []
-        if worksheet.main_block is None:
-            raise ValueError("main block 이 존재해야함")
 
-        main_block: MainBlock = worksheet.main_block
         if not main_block.body:
             raise ValueError("main block 의 내용이 존재해야함.")
 
@@ -169,6 +166,7 @@ class BlockService:
     def find_reference_blocks_in_block(self, block: Block) -> list[dict[str, str]]:
         block_dict = block.to_dict()
         references = []
+        seen_references = set()
 
         def traverse(block: dict[str, Any]):
             block_type = block.get(Block.FIELD_BLOCK_TYPE)
@@ -177,12 +175,15 @@ class BlockService:
                 reference_function_name = block.get(
                     ReferenceBlock.FIELD_REFERENCE_FUNCTION_NAME, "UnKnown"
                 )
-                references.append(
-                    {
-                        "reference_id": reference_id,
-                        "reference_function_name": reference_function_name,
-                    }
-                )
+                reference_key = (reference_id, reference_function_name)
+                if reference_key not in seen_references:
+                    seen_references.add(reference_key)
+                    references.append(
+                        {
+                            "reference_id": reference_id,
+                            "reference_function_name": reference_function_name,
+                        }
+                    )
 
             elif "body" in block and isinstance(block["body"], list):
                 for child_block in block["body"]:

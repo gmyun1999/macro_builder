@@ -1,5 +1,7 @@
 import hashlib
 
+from django.db import transaction
+
 from macro_sheet.domain.gui.gui import Gui, Script
 from macro_sheet.infra.packing_server import PackagingClient
 from macro_sheet.infra.repo.gui_repo import GuiRepo, ScriptRepo
@@ -16,7 +18,7 @@ class GuiService:
         self.gui_repo: IGuiRepo = GuiRepo()
         self.script_repo: IScriptRepo = ScriptRepo()
 
-    def get_gui_link(self, script_code: str):
+    def get_gui_link(self, script_code: str) -> str:
         """
         script code를 로컬에 저장하는건 아닌거같고,
         어떤 형태로 해서 바로 패키지 서버로 보낸다음
@@ -56,6 +58,11 @@ class GuiService:
             return None
 
         return gui_vo[0]
+
+    def save_gui_and_script(self, gui: Gui, script: Script):
+        with transaction.atomic():
+            self.save_gui(gui=gui)
+            self.save_script(script=script)
 
     def delete_gui(self, gui: Gui):
         """
