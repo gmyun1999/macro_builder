@@ -5,12 +5,12 @@ from macro_sheet.interface.view.function_view import (
     GETMyFunctionListView,
     MYBlockFunctionView,
 )
+from macro_sheet.interface.view.gui_view import GenerateGuiView
 from macro_sheet.interface.view.worksheet_view import (
     GETMyWorksheetListView,
     MYWorksheetView,
     WorksheetValidatorView,
 )
-from macro_sheet.interface.views import TestView
 
 urlpatterns = [
     path(
@@ -45,5 +45,5 @@ urlpatterns = [
         view=GETMyWorksheetListView.as_view(),
         name="bulk_fetch_my_worksheets",
     ),
-    path("gui/", view=TestView.as_view(), name="test"),
+    path("gui/", view=GenerateGuiView.as_view(), name="generate_gui"),
 ]
