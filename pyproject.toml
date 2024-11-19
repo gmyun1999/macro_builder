@@ -28,6 +28,7 @@ pydot = "^3.0.2"
 psycopg2-binary = "^2.9.10"
 gunicorn = "^23.0.0"
 drf-yasg = "^1.21.8"
+whitenoise = "^6.8.2"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.2"
