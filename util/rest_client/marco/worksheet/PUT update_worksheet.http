@@ -2,10 +2,36 @@ PUT {{macro-host}}/me/worksheet/91f9b47c-5375-4cc0-a55a-c25e70f0f8bd/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
-# 백엔드 예외처리: reference block id가 존재하지않으면 저장안됨.
+# 밑은 다음과같이 표현된다. 자세한 블록도메인은 domain.excalidraw 에서 확인할 수 있다.
+# {
+#   main_block {
+#     MAIN_BLOCK {
+#       BASE_LOOP_BLOCK {
+#         FILE_SYSTEM_BLOCK
+#         BASE_LOOP_BLOCK {
+#           REFERENCE_BLOCK
+#           FILE_SYSTEM_BLOCK
+#         }
+#         BASE_LOOP_BLOCK {
+#           REFERENCE_BLOCK
+#           FILE_SYSTEM_BLOCK
+#         }
+#         BASE_LOOP_BLOCK {
+#           REFERENCE_BLOCK
+#           FILE_SYSTEM_BLOCK
+#         }
+#         REFERENCE_BLOCK
+#       }
+#     }
+#   }
+  
+#   blocks [    REFERENCE_BLOCK    REFERENCE_BLOCK  ]
+  
+#   related_function_ids
+# }
 {
-    "id": "91f9b47c-5375-4cc0-a55a-c25e70f0f8bd",
-    "name" :"ws123",
+  "id": "91f9b47c-5375-4cc0-a55a-c25e70f0f8bd",
+  "name": "ws123",
   "main_block": {
     "block_type": "MAIN_BLOCK",
     "body": [
@@ -25,26 +51,9 @@ Authorization: Bearer {{macro-jwt}}
             "rename": null
           },
           {
-            "block_type": "BASE_LOOP_BLOCK",
-            "iter_cnt": "3",
-            "body": [
-              {
-                "block_type": "REFERENCE_BLOCK",
-                "reference_id": "func_nested_1",
-                "reference_function_name": "UnKnown"
-              },
-              {
-                "block_type": "FILE_SYSTEM_BLOCK",
-                "target": "FILE",
-                "action": "MOVE",
-                "loc": "/C/user/downloads/",
-                "condition": [
-                  { "FILE_NAME_ENDSWITH": "_old" }
-                ],
-                "destination": "/C/user/old_downloads/",
-                "rename": null
-              }
-            ]
+            "block_type": "REFERENCE_BLOCK",
+            "reference_id": "func_nested_1",
+            "reference_function_name": "UnKnown"
           },
           {
             "block_type": "BASE_LOOP_BLOCK",
@@ -54,39 +63,6 @@ Authorization: Bearer {{macro-jwt}}
                 "block_type": "REFERENCE_BLOCK",
                 "reference_id": "func_nested_1",
                 "reference_function_name": "UnKnown"
-              },
-              {
-                "block_type": "FILE_SYSTEM_BLOCK",
-                "target": "FILE",
-                "action": "MOVE",
-                "loc": "/C/user/downloads/",
-                "condition": [
-                  { "FILE_NAME_ENDSWITH": "_old" }
-                ],
-                "destination": "/C/user/old_downloads/",
-                "rename": null
-              }
-            ]
-          },
-          {
-            "block_type": "BASE_LOOP_BLOCK",
-            "iter_cnt": "3",
-            "body": [
-              {
-                "block_type": "REFERENCE_BLOCK",
-                "reference_id": "func_nested_2",
-                "reference_function_name": "UnKnown"
-              },
-              {
-                "block_type": "FILE_SYSTEM_BLOCK",
-                "target": "FILE",
-                "action": "MOVE",
-                "loc": "/C/user/downloads/",
-                "condition": [
-                  { "FILE_NAME_ENDSWITH": "_old" }
-                ],
-                "destination": "/C/user/old_downloads/",
-                "rename": null
               }
             ]
           },
@@ -100,18 +76,18 @@ Authorization: Bearer {{macro-jwt}}
     ]
   },
   "blocks": [
-              {
-            "block_type": "REFERENCE_BLOCK",
-            "reference_id": "func_nested_2",
-            "reference_function_name": "UnKnown"
-          },
-                    {
-            "block_type": "REFERENCE_BLOCK",
-            "reference_id": "func_nested_2",
-            "reference_function_name": "UnKnown"
-          }
+    {
+      "block_type": "REFERENCE_BLOCK",
+      "reference_id": "func_nested_2",
+      "reference_function_name": "UnKnown"
+    },
+    {
+      "block_type": "REFERENCE_BLOCK",
+      "reference_id": "func_nested_2",
+      "reference_function_name": "UnKnown"
+    }
   ],
-    "related_function_ids" : ["1","2","3","4","5"],
-    "raw_blocks": [], 
-    "raw_main_block": []
+  "related_function_ids": ["1", "2", "3", "4", "5"],
+  "raw_blocks": [],
+  "raw_main_block": []
 }

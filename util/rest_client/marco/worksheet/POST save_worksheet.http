@@ -3,6 +3,7 @@ Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
 # 백엔드 예외처리: reference block id가 존재하지않으면 저장안됨.
+# 자세한 블록도메인은 domain.excalidraw 에서 확인할 수 있다.
 {
       "name" :"ws1",
       "main_block": {
