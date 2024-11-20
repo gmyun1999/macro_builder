@@ -84,7 +84,7 @@ LOGGING = {
     },
 }
 
-ALLOWED_HOSTS = ["43.203.255.198", "127.0.0.1"]
+ALLOWED_HOSTS = ["43.203.255.198", "127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -106,6 +106,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -117,8 +118,17 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = ["*"]
-
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 ROOT_URLCONF = "macro_be.urls"
 
 # api document - drf-spectacular
