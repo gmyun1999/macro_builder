@@ -85,7 +85,7 @@ LOGGING = {
 }
 
 ALLOWED_HOSTS = ["43.203.255.198", "127.0.0.1", "localhost"]
-
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -117,18 +117,6 @@ MIDDLEWARE = [
     # "common.middleware.error_handler.CustomServerErrorMiddleware",
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
 ROOT_URLCONF = "macro_be.urls"
 
 # api document - drf-spectacular
