@@ -18,6 +18,8 @@ from pathlib import Path
 import environ
 import pymysql
 
+from macro_sheet.interface.api_documents.schema import APPEND_COMPONENTS
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 print(BASE_DIR)
@@ -111,13 +113,24 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "common.middleware.error_handler.CustomServerErrorMiddleware",
+    # "common.middleware.error_handler.CustomServerErrorMiddleware",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = ["*"]
 
 ROOT_URLCONF = "macro_be.urls"
+
+# api document - drf-spectacular
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Block API",
+    "DESCRIPTION": "Documentation for Block-based Macro Builder API",
+    "VERSION": "1.0.0",
+    "APPEND_COMPONENTS": APPEND_COMPONENTS,
+}
 
 TEMPLATES = [
     {

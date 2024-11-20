@@ -1,11 +1,17 @@
 from dataclasses import dataclass
 from typing import Any
 
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from pydantic import BaseModel, Field
 from rest_framework.views import APIView
 
 from common.domain import PagedResult
-from common.interface.response import error_response, success_response
+from common.interface.response import (
+    ErrorResponse,
+    SuccessResponse,
+    error_response,
+    success_response,
+)
 from common.interface.validators import validate_body, validate_query_params
 from common.service.token.exception import PagingException
 from macro_sheet.domain.block.base_block.main_block import MainBlock
@@ -19,6 +25,7 @@ from macro_sheet.usecase.worksheet_usecase import WorksheetUseCase
 from user.domain.user_role import UserRoles
 from user.domain.user_token import UserTokenPayload
 from user.interface.validator.user_token_validator import validate_token
+from util.pydantic_serializer import PydanticToDjangoSerializer
 
 
 class GETMyWorksheetListView(APIView):
@@ -71,6 +78,10 @@ class MYWorksheetView(APIView):
     user 토큰을 까서 해당 유저의 worksheet 관련 view
     """
 
+    class MainBlockSchema(BaseModel):
+        block_type: str
+        body: list
+
     class CreateBodyParams(BaseModel):
         name: str = Field(default="unknown", max_length=255)
         blocks: list
@@ -111,15 +122,44 @@ class MYWorksheetView(APIView):
             data=dicted_worksheet, message="성공적인 fetch올시다", status=200
         )
 
+    @extend_schema(
+        summary="worksheet 생성.",
+        description="request는 뼈대만 보여줍니다. 실제 사용시에는 하단 스키마의  main_block, blocks을 참고한후 채워서 보내주세요.",
+        request=PydanticToDjangoSerializer.convert(CreateBodyParams),
+        responses={
+            201: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="worksheet, function, block error",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     @validate_body(CreateBodyParams)
     def post(self, request, token_payload: UserTokenPayload, body: CreateBodyParams):
         """
         worksheet 생성.
         """
+
         try:
             main_block_vo = MainBlock.from_dict(body.main_block)
             blocks_vo = [Block.from_dict(block) for block in body.blocks]
+
+        except (ValueError, AttributeError) as e:
+            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+
+        try:
             worksheet_id = self.worksheet_use_case.create_process(
                 worksheet_name=body.name,
                 owner_id=token_payload.user_id,
@@ -138,9 +178,6 @@ class MYWorksheetView(APIView):
 
         except FunctionException as e:
             return error_response(code=e.code, message=str(e), status=400)
-
-        except (ValueError, AttributeError) as e:
-            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
 
     @validate_token(roles=UserRoles.USER_ROLES)
     @validate_body(UpdateBodyParams)
