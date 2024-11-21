@@ -3,6 +3,7 @@ from functools import wraps
 from django.http import JsonResponse
 from rest_framework import status
 
+from common.interface.response import error_response
 from common.response_msg import MESSAGE
 from common.service.token.i_token_parser import ITokenParser
 from user.domain.user_role import UserRoles
@@ -30,8 +31,8 @@ def validate_token(
             )
 
             if token_payload_vo is None:
-                return JsonResponse(
-                    data={MESSAGE: result_message}, status=status.HTTP_403_FORBIDDEN
+                error_response(
+                    code="VALIDATE_TOKEN_ERROR", message=result_message, status=403
                 )
 
             return f(*args, **kwargs, token_payload=token_payload_vo)

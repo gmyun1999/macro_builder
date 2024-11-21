@@ -7,6 +7,8 @@ from pydantic import BaseModel, ValidationError
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 
+from common.interface.response import error_response
+
 
 def validate_query_params(model: Type[BaseModel]):
     def decorated_func(f):
@@ -17,9 +19,10 @@ def validate_query_params(model: Type[BaseModel]):
             try:
                 validated_params = model.model_validate(params)
             except ValidationError as e:
-                return JsonResponse(
-                    data={"details": e.errors()},
-                    status=status.HTTP_400_BAD_REQUEST,
+                error_response(
+                    code="VALIDATE_QUERY_ERROR",
+                    message="query params validation error",
+                    detail={"details": e.errors()},
                 )
 
             return f(*args, **kwargs, params=validated_params)
@@ -39,9 +42,10 @@ def validate_body(model: Type[BaseModel]):
                 validated_body = model.model_validate(body)
             except ValidationError as e:
                 print(e.errors())
-                return JsonResponse(
-                    data={"details": e.errors()},
-                    status=status.HTTP_400_BAD_REQUEST,
+                error_response(
+                    code="VALIDATE_BODY_ERROR",
+                    message="Body validation error",
+                    detail={"details": e.errors()},
                 )
 
             return f(*args, **kwargs, body=validated_body)
@@ -66,9 +70,10 @@ def validate_form_data(model: Type[BaseModel]):
             try:
                 validated_form_data = model.model_validate(form_data)
             except ValidationError as e:
-                return JsonResponse(
-                    data={"details": e.errors()},
-                    status=status.HTTP_400_BAD_REQUEST,
+                error_response(
+                    code="VALIDATE_FORM_DATA_ERROR",
+                    message="form validation error",
+                    detail={"details": e.errors()},
                 )
 
             return f(*args, **kwargs, form_data=validated_form_data)
