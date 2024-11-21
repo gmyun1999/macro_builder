@@ -41,6 +41,46 @@ class GETMyWorksheetListView(APIView):
     def __init__(self):
         self.worksheet_use_case = WorksheetUseCase()
 
+    @extend_schema(
+        summary="나의 worksheet를 넘겨줘서 가져온다.",
+        description=", page, page_size를 query params로 넘겨줘서 페이징처리 가능",
+        parameters=[
+            OpenApiParameter(
+                name="page",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="페이지 번호 (기본값: 1)",
+                default=1,
+            ),
+            OpenApiParameter(
+                name="page_size",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="페이지 크기 (기본값: 10)",
+                default=10,
+            ),
+        ],
+        responses={
+            201: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="페이징 에러",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     @validate_query_params(QueryParams)
     def get(self, request, token_payload: UserTokenPayload, params: QueryParams):
@@ -67,10 +107,7 @@ class GETMyWorksheetListView(APIView):
             return success_response(data=response_data, message="워크시트 조회에 성공했습니다.")
 
         except PagingException as e:
-            if hasattr(e, "code"):
-                return error_response(code=e.code, message=str(e), status=400)
-            else:
-                return error_response(code="UNKNOWN_ERROR", message=str(e), status=400)
+            return error_response(code=e.code, message=str(e), status=400)
 
 
 class MYWorksheetView(APIView):
@@ -100,6 +137,28 @@ class MYWorksheetView(APIView):
     def __init__(self):
         self.worksheet_use_case = WorksheetUseCase()
 
+    @extend_schema(
+        summary="worksheet fetch, id 를 넘겨줘서 가져온다.",
+        description="",
+        responses={
+            201: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="worksheet not found error",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     def get(self, request, worksheet_id: str, token_payload: UserTokenPayload):
         """
@@ -115,7 +174,12 @@ class MYWorksheetView(APIView):
             return error_response(code=e.code, message=str(e), status=400)
 
         if worksheet.owner_id != token_payload.user_id:
-            return error_response(message="권한이 없습니다.")
+            return error_response(
+                code="DOES_NOT_PERMISSION",
+                message="권한이 없습니다.",
+                status=403,
+                detail={"detail": "본인의 worksheet만 fetch 가능합니다."},
+            )
 
         dicted_worksheet = worksheet.to_dict()
         return success_response(
@@ -158,7 +222,10 @@ class MYWorksheetView(APIView):
 
         except (ValueError, AttributeError) as e:
             return error_response(
-                message="invalid block format.", detail={"invalid": str(e)}, status=400
+                code="INVALID_BLOCK_FORMAT",
+                message="invalid block format",
+                detail={"invalid": str(e)},
+                status=400,
             )
 
         try:
@@ -181,6 +248,29 @@ class MYWorksheetView(APIView):
         except FunctionException as e:
             return error_response(code=e.code, message=str(e), status=400)
 
+    @extend_schema(
+        summary="worksheet update.",
+        description="request는 뼈대만 보여줍니다. 실제 사용시에는 하단 스키마의  main_block, blocks을 참고한후 채워서 보내주세요.",
+        request=PydanticToDjangoSerializer.convert(UpdateBodyParams),
+        responses={
+            200: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="worksheet, function, block format error or 기타 에러",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     @validate_body(UpdateBodyParams)
     def put(
@@ -193,13 +283,18 @@ class MYWorksheetView(APIView):
         """
         worksheet id 에 해당되는 worksheet 를 수정한다.
         """
+        worksheet = self.worksheet_use_case.fetch_process(worksheet_id=worksheet_id)
+        if worksheet.owner_id != token_payload.user_id:
+            return error_response(
+                code="DOES_NOT_PERMISSION",
+                message="권한이 없습니다.",
+                status=403,
+                detail={"detail": "본인의 worksheet만 수정 가능합니다."},
+            )
         try:
-            worksheet = self.worksheet_use_case.fetch_process(worksheet_id=worksheet_id)
-            if worksheet.owner_id != token_payload.user_id:
-                return error_response(message="권한이 없습니다.")
-
             main_block_vo = MainBlock.from_dict(body.main_block)
             blocks_vo = [Block.from_dict(block) for block in body.blocks]
+
             self.worksheet_use_case.update_process(
                 worksheet_id=worksheet_id,
                 worksheet_name=body.name,
@@ -213,6 +308,15 @@ class MYWorksheetView(APIView):
             return success_response(
                 data="", message=f"worksheet id {worksheet_id}가 변경되었소", status=200
             )
+
+        except (ValueError, AttributeError) as e:
+            return error_response(
+                code="INVALID_BLOCK_FORMAT",
+                message="invalid block format",
+                detail={"invalid": str(e)},
+                status=400,
+            )
+
         except WorksheetException as e:
             return error_response(
                 code=e.code, message=str(e), status=400, detail=e.detail
@@ -223,11 +327,28 @@ class MYWorksheetView(APIView):
                 code=e.code, message=str(e), status=400, detail=e.detail
             )
 
-        except (ValueError, AttributeError) as e:
-            return error_response(
-                message="invalid block format", detail={"invalid": str(e)}, status=400
-            )
-
+    @extend_schema(
+        summary="worksheet delete.",
+        description="request는 뼈대만 보여줍니다. 실제 사용시에는 하단 스키마의  main_block, blocks을 참고한후 채워서 보내주세요.",
+        responses={
+            200: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="worksheet, function, block format error or 기타 에러",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     def delete(self, request, worksheet_id: str, token_payload: UserTokenPayload):
         """
@@ -252,7 +373,10 @@ class MYWorksheetView(APIView):
 
         except (ValueError, AttributeError) as e:
             return error_response(
-                message="invalid block format.", detail={"invalid": str(e)}, status=400
+                code="INVALID_BLOCK_FORMAT",
+                message="invalid block format",
+                detail={"invalid": str(e)},
+                status=400,
             )
 
         return success_response(
@@ -268,6 +392,29 @@ class WorksheetValidatorView(APIView):
     class BodyParams(BaseModel):
         main_block: dict
 
+    @extend_schema(
+        summary="worksheet validate.",
+        description="request는 뼈대만 보여줍니다. 실제 사용시에는 하단 스키마의  main_block, blocks을 참고한후 채워서 보내주세요.",
+        request=PydanticToDjangoSerializer.convert(BodyParams),
+        responses={
+            200: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="worksheet, function, block format error",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.ALL_USER_ROLES)
     @validate_body(BodyParams)
     def post(self, request, token_payload: UserTokenPayload, body: BodyParams):
@@ -276,18 +423,19 @@ class WorksheetValidatorView(APIView):
 
         except (ValueError, AttributeError) as e:
             return error_response(
-                message="invalid block format", detail={"invalid": str(e)}, status=400
+                code="INVALID_BLOCK_FORMAT",
+                message="invalid block format",
+                detail={"invalid": str(e)},
+                status=400,
             )
 
         result = self.worksheet_use_case.validate_worksheet(main_block=main_block_vo)
         if result:
             data = {"target": result, "is_valid": False}
             return success_response(
-                message=f"You are referencing a non-existent function.",
+                message="You are referencing a non-existent function.",
                 status=200,
                 data=data,
             )
 
-        return success_response(
-            data={"target": result, "is_valid": True}, message=f"valid", status=200
-        )
+        return success_response(data="", message="valid worksheet", status=200)

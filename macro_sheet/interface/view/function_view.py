@@ -1,10 +1,16 @@
 from dataclasses import dataclass
 from typing import Literal
 
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from pydantic import BaseModel, Field
 from rest_framework.views import APIView
 
-from common.interface.response import error_response, success_response
+from common.interface.response import (
+    ErrorResponse,
+    SuccessResponse,
+    error_response,
+    success_response,
+)
 from common.interface.validators import validate_body, validate_query_params
 from common.service.token.exception import PagingException
 from macro_sheet.domain.block.block import Block
@@ -16,6 +22,7 @@ from macro_sheet.usecase.block_function_usecase import BlockFunctionUseCase
 from user.domain.user_role import UserRoles
 from user.domain.user_token import UserTokenPayload
 from user.interface.validator.user_token_validator import validate_token
+from util.pydantic_serializer import PydanticToDjangoSerializer
 
 
 class GETMyFunctionListView(APIView):
@@ -31,6 +38,46 @@ class GETMyFunctionListView(APIView):
     def __init__(self):
         self.function_use_case = BlockFunctionUseCase()
 
+    @extend_schema(
+        summary="나의 function을 넘겨줘서 가져온다.",
+        description=", page, page_size를 query params로 넘겨줘서 페이징처리 가능",
+        parameters=[
+            OpenApiParameter(
+                name="page",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="페이지 번호 (기본값: 1)",
+                default=1,
+            ),
+            OpenApiParameter(
+                name="page_size",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="페이지 크기 (기본값: 10)",
+                default=10,
+            ),
+        ],
+        responses={
+            201: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="페이징 에러",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     @validate_query_params(QueryParams)
     def get(self, request, token_payload: UserTokenPayload, params: QueryParams):
@@ -79,6 +126,28 @@ class MYBlockFunctionView(APIView):
     def __init__(self):
         self.block_function_use_case = BlockFunctionUseCase()
 
+    @extend_schema(
+        summary="function fetch, id 를 넘겨줘서 가져온다.",
+        description="",
+        responses={
+            201: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="function not found error",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     def get(self, request, function_id: str, token_payload: UserTokenPayload):
         """
@@ -95,13 +164,41 @@ class MYBlockFunctionView(APIView):
             )
 
         if function.owner_id != token_payload.user_id:
-            return error_response(message="권한이 없습니다.")
+            return error_response(
+                code="DOES_NOT_PERMISSION",
+                message="권한이 없습니다.",
+                status=403,
+                detail={"detail": "본인의 function만 fetch 가능합니다."},
+            )
 
         dicted_function = function.to_dict()
         return success_response(
             data=dicted_function, message="성공적인 fetch올시다", status=200
         )
 
+    @extend_schema(
+        summary="function 생성.",
+        description="request는 뼈대만 보여줍니다. 실제 사용시에는 하단 스키마의  main_block, blocks을 참고한후 채워서 보내주세요.",
+        request=PydanticToDjangoSerializer.convert(CreateBodyParams),
+        responses={
+            201: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description=" function, block error, format error or 기타 에러",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     @validate_body(CreateBodyParams)
     def post(self, request, token_payload: UserTokenPayload, body: CreateBodyParams):
@@ -127,8 +224,36 @@ class MYBlockFunctionView(APIView):
             )
 
         except (ValueError, AttributeError) as e:
-            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+            return error_response(
+                code="INVALID_BLOCK_FORMAT",
+                message="invalid block format",
+                detail={"invalid": str(e)},
+                status=400,
+            )
 
+    @extend_schema(
+        summary="function update.",
+        description="request는 뼈대만 보여줍니다. 실제 사용시에는 하단 스키마의  main_block, blocks을 참고한후 채워서 보내주세요.",
+        request=PydanticToDjangoSerializer.convert(UpdateBodyParams),
+        responses={
+            200: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="function, block format error or 기타 에러",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     @validate_body(UpdateBodyParams)
     def put(
@@ -147,7 +272,12 @@ class MYBlockFunctionView(APIView):
             )
 
             if block_function.owner_id != token_payload.user_id:
-                return error_response(message="권한이 없습니다.")
+                return error_response(
+                    code="DOES_NOT_PERMISSION",
+                    message="권한이 없습니다.",
+                    status=403,
+                    detail={"detail": "본인의 function만 fetch 가능합니다."},
+                )
 
             blocks_vo = [Block.from_dict(block) for block in body.blocks]
 
@@ -163,14 +293,41 @@ class MYBlockFunctionView(APIView):
                 data="", message=f"block function id {function_id}가 변경되었소", status=200
             )
 
+        except (ValueError, AttributeError) as e:
+            return error_response(
+                code="INVALID_BLOCK_FORMAT",
+                message="invalid block format",
+                detail={"invalid": str(e)},
+                status=400,
+            )
+
         except FunctionException as e:
             return error_response(
                 code=e.code, message=str(e), status=400, detail=e.detail
             )
 
-        except (ValueError, AttributeError) as e:
-            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
-
+    @extend_schema(
+        summary="function delete.",
+        description="request는 뼈대만 보여줍니다. 실제 사용시에는 하단 스키마의  main_block, blocks을 참고한후 채워서 보내주세요.",
+        responses={
+            200: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description=" function, error or 기타 에러",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.USER_ROLES)
     @validate_query_params(DeleteQueryParams)
     def delete(
@@ -184,11 +341,17 @@ class MYBlockFunctionView(APIView):
         worksheet id 에 해당되는 worksheet 를 삭제한다.
         """
         try:
-            worksheet = self.block_function_use_case.fetch_process(
+            block_function = self.block_function_use_case.fetch_process(
                 function_id=function_id
             )
-            if worksheet.owner_id != token_payload.user_id:
-                return error_response(message="권한이 없습니다.")
+            if block_function.owner_id != token_payload.user_id:
+                return error_response(
+                    code="DOES_NOT_PERMISSION",
+                    message="권한이 없습니다.",
+                    status=403,
+                    detail={"detail": "본인의 function만 fetch 가능합니다."},
+                )
+
             if params.mode == "simple":
                 self.block_function_use_case.delete_process(function_id=function_id)
 
@@ -222,18 +385,51 @@ class FunctionValidatorView(APIView):
         raw_blocks: list
         name: str = Field(default="unknown", max_length=255)
 
+    @extend_schema(
+        summary="function validate.",
+        description="request는 뼈대만 보여줍니다. 실제 사용시에는 하단 스키마의  main_block, blocks을 참고한후 채워서 보내주세요.",
+        request=PydanticToDjangoSerializer.convert(BodyParams),
+        responses={
+            200: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(SuccessResponse),
+                description="성공적인 응답",
+            ),
+            400: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="function not found, block format error",
+            ),
+            403: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="토큰이 만료되거나 권한이 없을시 발생",
+            ),
+            503: OpenApiResponse(
+                PydanticToDjangoSerializer.convert(ErrorResponse),
+                description="기타 서버에러 발생시 발생",
+            ),
+        },
+    )
     @validate_token(roles=UserRoles.ALL_USER_ROLES)
     @validate_body(BodyParams)
     def post(self, request, token_payload: UserTokenPayload, body: BodyParams):
         # TODO: 뭔가 나중에 user, guest 에 따라서 validate를 다르게 할수있을듯.
-        blocks_vo = [Block.from_dict(block) for block in body.blocks]
-        result = self.function_use_case.validate_function(blocks=blocks_vo)
+        try:
+            blocks_vo = [Block.from_dict(block) for block in body.blocks]
+            result = self.function_use_case.validate_function(blocks=blocks_vo)
+
+        except (ValueError, AttributeError) as e:
+            return error_response(
+                code="INVALID_BLOCK_FORMAT",
+                message="invalid block format",
+                detail={"invalid": str(e)},
+                status=400,
+            )
+
         if result:
             data = {"target": result, "is_valid": False}
             return success_response(
-                message=f"존재하지않는 function을 참조하고있습니다", status=200, data=data
+                message="You are referencing a non-existent function.",
+                status=200,
+                data=data,
             )
 
-        return success_response(
-            data={"target": result, "is_valid": True}, message=f"valid", status=200
-        )
+        return success_response(data="", message="valid worksheet", status=200)
