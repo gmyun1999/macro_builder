@@ -157,7 +157,9 @@ class MYWorksheetView(APIView):
             blocks_vo = [Block.from_dict(block) for block in body.blocks]
 
         except (ValueError, AttributeError) as e:
-            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+            return error_response(
+                message="invalid block format.", detail={"invalid": str(e)}, status=400
+            )
 
         try:
             worksheet_id = self.worksheet_use_case.create_process(
@@ -222,7 +224,9 @@ class MYWorksheetView(APIView):
             )
 
         except (ValueError, AttributeError) as e:
-            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+            return error_response(
+                message="invalid block format", detail={"invalid": str(e)}, status=400
+            )
 
     @validate_token(roles=UserRoles.USER_ROLES)
     def delete(self, request, worksheet_id: str, token_payload: UserTokenPayload):
@@ -247,7 +251,9 @@ class MYWorksheetView(APIView):
             )
 
         except (ValueError, AttributeError) as e:
-            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+            return error_response(
+                message="invalid block format.", detail={"invalid": str(e)}, status=400
+            )
 
         return success_response(
             data="", message=f"worksheet id {worksheet_id}가 삭제되었소", status=200
@@ -269,13 +275,17 @@ class WorksheetValidatorView(APIView):
             main_block_vo = MainBlock.from_dict(body.main_block)
 
         except (ValueError, AttributeError) as e:
-            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+            return error_response(
+                message="invalid block format", detail={"invalid": str(e)}, status=400
+            )
 
         result = self.worksheet_use_case.validate_worksheet(main_block=main_block_vo)
         if result:
             data = {"target": result, "is_valid": False}
             return success_response(
-                message=f"존재하지않는 function을 참조하고있습니다", status=200, data=data
+                message=f"You are referencing a non-existent function.",
+                status=200,
+                data=data,
             )
 
         return success_response(

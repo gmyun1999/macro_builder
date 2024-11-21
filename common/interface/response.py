@@ -14,7 +14,11 @@ def success_response(
 ) -> JsonResponse:
     response_model = SuccessResponse(data=data, message=message)
 
-    return JsonResponse(response_model.model_dump(), status=status)
+    return JsonResponse(
+        response_model.model_dump(),
+        status=status,
+        content_type="application/json; charset=utf-8",
+    )
 
 
 class ErrorDetail(BaseModel):
@@ -37,4 +41,8 @@ def error_response(
         error=ErrorDetail(code=code, message=message, detail=detail)
     )
 
-    return JsonResponse(response_model.model_dump(), status=status)
+    return JsonResponse(
+        response_model.model_dump(),
+        status=status,
+        content_type="application/json; charset=utf-8",
+    )
