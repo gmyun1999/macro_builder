@@ -102,8 +102,6 @@ INSTALLED_APPS = [
     "user",
     "macro_sheet",
     "django_extensions",
-    "django_cte",
-    "drf_yasg",
 ]
 
 MIDDLEWARE = [

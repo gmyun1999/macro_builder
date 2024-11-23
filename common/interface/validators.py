@@ -19,7 +19,7 @@ def validate_query_params(model: Type[BaseModel]):
             try:
                 validated_params = model.model_validate(params)
             except ValidationError as e:
-                error_response(
+                return error_response(
                     code="VALIDATE_QUERY_ERROR",
                     message="query params validation error",
                     detail={"details": e.errors()},
@@ -42,7 +42,7 @@ def validate_body(model: Type[BaseModel]):
                 validated_body = model.model_validate(body)
             except ValidationError as e:
                 print(e.errors())
-                error_response(
+                return error_response(
                     code="VALIDATE_BODY_ERROR",
                     message="Body validation error",
                     detail={"details": e.errors()},
@@ -70,7 +70,7 @@ def validate_form_data(model: Type[BaseModel]):
             try:
                 validated_form_data = model.model_validate(form_data)
             except ValidationError as e:
-                error_response(
+                return error_response(
                     code="VALIDATE_FORM_DATA_ERROR",
                     message="form validation error",
                     detail={"details": e.errors()},

@@ -31,7 +31,7 @@ def validate_token(
             )
 
             if token_payload_vo is None:
-                error_response(
+                return error_response(
                     code="VALIDATE_TOKEN_ERROR", message=result_message, status=403
                 )
 
