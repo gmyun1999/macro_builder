@@ -14,6 +14,7 @@ class BlockType(StrEnum):
 
     # base 를 상속한 block type
     FILE_SYSTEM_BLOCK = "FILE_SYSTEM_BLOCK"
+    RECORDER_BLOCK = "RECORDER_BLOCK"
 
     # 다른 block의 정보를 참조하는 block type
     REFERENCE_BLOCK = "REFERENCE_BLOCK"

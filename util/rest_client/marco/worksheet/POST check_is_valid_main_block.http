@@ -9,6 +9,12 @@ Authorization: Bearer {{macro-jwt}}
         "block_type": "MAIN_BLOCK",
         "body": [
           {
+            "block_type": "RECORDER_BLOCK",
+            "body" : {
+
+            }
+          },
+          {
             "block_type": "BASE_LOOP_BLOCK",
             "iter_cnt": "2",
             "body": [
