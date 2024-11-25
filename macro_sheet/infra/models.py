@@ -109,7 +109,7 @@ class Script(models.Model):
     id = models.CharField(max_length=255, primary_key=True)
     script_code = models.TextField()
     script_hash = models.CharField(max_length=64, unique=True)
-    gui_id = models.ForeignKey(
+    gui = models.ForeignKey(
         Gui, related_name="script_gui", on_delete=models.CASCADE, db_constraint=False
     )
 

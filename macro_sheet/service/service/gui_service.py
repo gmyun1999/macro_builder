@@ -41,7 +41,7 @@ class GuiService:
         """
         script save
         """
-        return self.save_script(script=script)
+        return self.script_repo.create(script=script)
 
     def get_script_by_hash(self, script_hash: str) -> Script | None:
         return self.script_repo.get(self.script_repo.Filter(script_hash=script_hash))

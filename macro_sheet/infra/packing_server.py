@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 import httpx
 
 from macro_be.settings import PACKAGE_SERVER_URL
@@ -15,7 +17,8 @@ class PackagingClient(PackagingClientInterface):
         """
         패키징 서버에 스크립트를 문자열로 업로드하고 GUI 다운로드 링크를 반환한다.
         """
-        url = f"{self.base_url}/package"
+        url = urljoin(self.base_url, "/package")
+        print("dd", url)
         payload = {"content": script_content}
 
         response = httpx.post(url, json=payload, timeout=120.0)
