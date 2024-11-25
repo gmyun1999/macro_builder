@@ -10,7 +10,7 @@ class SuccessResponse(BaseModel):
 
 
 def success_response(
-    data: Any, message: str = "성공적으로 처리되었습니다.", status: int = 00
+    data: Any, message: str = "성공적으로 처리되었습니다.", status: int = 200
 ) -> JsonResponse:
     response_model = SuccessResponse(data=data, message=message)
 
