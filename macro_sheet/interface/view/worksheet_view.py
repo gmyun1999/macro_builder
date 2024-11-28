@@ -220,7 +220,7 @@ class MYWorksheetView(APIView):
             main_block_vo = MainBlock.from_dict(body.main_block)
             blocks_vo = [Block.from_dict(block) for block in body.blocks]
 
-        except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError, KeyError) as e:
             return error_response(
                 code="INVALID_BLOCK_FORMAT",
                 message="invalid block format",
@@ -309,7 +309,7 @@ class MYWorksheetView(APIView):
                 data="", message=f"worksheet id {worksheet_id}가 변경되었소", status=200
             )
 
-        except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError, KeyError) as e:
             return error_response(
                 code="INVALID_BLOCK_FORMAT",
                 message="invalid block format",
@@ -371,7 +371,7 @@ class MYWorksheetView(APIView):
                 code=e.code, message=str(e), status=400, detail=e.detail
             )
 
-        except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError, KeyError) as e:
             return error_response(
                 code="INVALID_BLOCK_FORMAT",
                 message="invalid block format",
@@ -421,7 +421,7 @@ class WorksheetValidatorView(APIView):
         try:
             main_block_vo = MainBlock.from_dict(body.main_block)
 
-        except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError, KeyError) as e:
             return error_response(
                 code="INVALID_BLOCK_FORMAT",
                 message="invalid block format",

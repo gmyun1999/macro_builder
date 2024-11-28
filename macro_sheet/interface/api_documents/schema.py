@@ -1,3 +1,7 @@
+from macro_sheet.domain.block.api_block.law_api_block import (
+    LawApiBlock,
+    LawConditionDetail,
+)
 from macro_sheet.domain.block.base_block.loop_block import LoopBlock
 from macro_sheet.domain.block.base_block.main_block import MainBlock
 from macro_sheet.domain.block.base_block.reference_block import ReferenceBlock
@@ -117,6 +121,52 @@ APPEND_COMPONENTS = {
                 "destination": "/path/to/destination",
                 "rename": None,
                 "block_type": "FILE_SYSTEM_BLOCK",
+            },
+        },
+        "RecorderBlock": {
+            "type": "object",
+            "properties": {
+                Block.FIELD_BLOCK_TYPE: {
+                    "type": "string",
+                    "const": "RECORDER_BLOCK",
+                },
+                "body": {
+                    "type": "object",
+                    "nullable": True,
+                },
+            },
+            "example": {
+                "block_type": "RECORDER_BLOCK",
+                "body": {},
+            },
+        },
+        "LawApiBlock": {
+            "type": "object",
+            "properties": {
+                Block.FIELD_BLOCK_TYPE: {
+                    "type": "string",
+                    "const": "LAW_API_BLOCK",
+                },
+                "save_data_type": {
+                    "type": "string",
+                    "enum": ["CSV"],
+                    "example": "CSV",
+                },
+                LawApiBlock.FIELD_CONDITION: {
+                    "type": "string",
+                    "enum": [e.value for e in LawConditionDetail],
+                    "example": LawConditionDetail.KEYWORD.value,
+                },
+                LawApiBlock.FIELD_LOC: {
+                    "type": "string",
+                    "example": "\\D:\\사용자",
+                },
+            },
+            "example": {
+                "block_type": "LAW_API_BLOCK",
+                "save_data_type": "CSV",
+                "condition": [],
+                "loc": "\\D:\\사용자",
             },
         },
         "Block": {

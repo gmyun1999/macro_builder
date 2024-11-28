@@ -223,7 +223,7 @@ class MYBlockFunctionView(APIView):
                 code=e.code, message=str(e), status=400, detail=e.detail
             )
 
-        except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError, KeyError) as e:
             return error_response(
                 code="INVALID_BLOCK_FORMAT",
                 message="invalid block format",
@@ -293,7 +293,7 @@ class MYBlockFunctionView(APIView):
                 data="", message=f"block function id {function_id}가 변경되었소", status=200
             )
 
-        except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError, KeyError) as e:
             return error_response(
                 code="INVALID_BLOCK_FORMAT",
                 message="invalid block format",
@@ -416,7 +416,7 @@ class FunctionValidatorView(APIView):
             blocks_vo = [Block.from_dict(block) for block in body.blocks]
             result = self.function_use_case.validate_function(blocks=blocks_vo)
 
-        except (ValueError, AttributeError) as e:
+        except (ValueError, AttributeError, KeyError) as e:
             return error_response(
                 code="INVALID_BLOCK_FORMAT",
                 message="invalid block format",
