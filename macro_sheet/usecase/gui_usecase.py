@@ -79,7 +79,7 @@ class GuiUseCase:
             download_link = gui_vo.url  # type: ignore
             return download_link
 
-        # self.block_service.convert_file_from_script(script_code)
+        self.block_service.convert_file_from_script(script_code)
         # 스크립트가 존재하지않으면 이 스크립트를 가지고와서 패키징 서버에 밀어넣은후에 s3 gui link ,script 모두 저장해야한다.
         download_link = self.gui_service.get_gui_link(script_code=script_code)
 

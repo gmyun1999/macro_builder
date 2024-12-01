@@ -1,3 +1,4 @@
+import uuid
 from typing import Any
 
 import httpx
@@ -58,6 +59,7 @@ class BlockService:
         commands = []
         iter_cnt = block.iter_cnt
         commands.append(f"{indent_str}for _ in range({iter_cnt}):")
+
         for inner_block in block.body:
             if isinstance(inner_block, FileSystemBlock):
                 cmd = self.convert_file_system_block_to_str_code(
@@ -74,6 +76,12 @@ class BlockService:
                     inner_block, block_functions, indent=indent + 4, visited=visited
                 )
                 commands.append(cmd)
+            elif isinstance(inner_block, RecorderBlock):
+                cmd = self.render_recorder_block_to_str_code(
+                    inner_block, indent=indent + 4
+                )
+                commands.append(cmd)
+
         return "\n".join(commands)
 
     def render_reference_block_to_str_code(
@@ -126,6 +134,11 @@ class BlockService:
                         block, block_functions, indent=4, visited=visited
                     )
                     func_body.append(cmd)
+                elif isinstance(block, RecorderBlock):
+                    cmd = self.render_recorder_block_to_str_code(
+                        block, indent=indent + 4
+                    )
+                    func_body.append(cmd)
             # Store the generated function code
             self.generated_functions[reference_id] = "\n".join(func_body)
 
@@ -135,8 +148,55 @@ class BlockService:
     def render_api_block_to_str_code(self, block: LawApiBlock) -> str:
         return "pass"
 
-    def render_recorder_block_to_str_code(self, block: RecorderBlock) -> str:
-        return "pass"
+    def render_recorder_block_to_str_code(
+        self, block: RecorderBlock, indent: str = 4
+    ) -> str:
+        """
+        Renders a RecorderBlock to a dynamically generated Python function and
+        returns the function call code.
+
+        Function definition is stored in `self.generated_functions`.
+
+        Args:
+            block (RecorderBlock): The recorder block to convert.
+            function_counter (int): Counter to ensure unique function names.
+            indent (int): Number of spaces to indent the function body.
+        """
+        function_indent = 4
+        # Generate a unique function name based on the counter
+        function_name = f"send_recorder_data_{uuid.uuid4().hex}"
+
+        # Recorder block's data (convert to dict if necessary)
+        recorder_data = block.body  # Assuming RecorderBlock has a `to_dict()` method
+
+        # Indent strings
+        function_indent_str = " " * function_indent
+        indent_str = " " * indent
+        # Define the function code with controlled indentation
+        function_body = (
+            f"def {function_name}():\n"
+            f'{function_indent_str}host = "127.0.0.1"\n'
+            f"{function_indent_str}port = 1000\n"
+            f'{function_indent_str}api_key = "test_key"\n'
+            f'{function_indent_str}endpoint = "/execute_recorder/"\n'
+            f'{function_indent_str}url = f"http://{{host}}:{{port}}{{endpoint}}"\n\n'
+            f'{function_indent_str}headers = {{"Content-Type": "application/json", "Api-Key": api_key}}\n'
+            f"{function_indent_str}recorder_data = {recorder_data}\n\n"
+            f"{function_indent_str}try:\n"
+            f"{function_indent_str * 2}response = requests.post(url, json=recorder_data, headers=headers)\n"
+            f"{function_indent_str * 2}if response.status_code == 200:\n"
+            f'{function_indent_str * 3}print("recorder 실행 성공")\n'
+            f"{function_indent_str * 2}else:\n"
+            f'{function_indent_str * 3}print("recorder 실행 실패")\n'
+            f"{function_indent_str}except Exception as e:\n"
+            f'{function_indent_str * 2}print(f"에러: {{str(e)}}")'
+        )
+
+        # Store the function definition in `self.generated_functions`
+        self.generated_functions[function_name] = function_body
+
+        # Return the function call code
+        return f"{indent_str}{function_name}()"
 
     def generate_script_from_worksheet(
         self, main_block: MainBlock, block_functions: list[BlockFunction]
@@ -161,6 +221,7 @@ class BlockService:
                 cmd = self.render_reference_block_to_str_code(block, block_functions)
                 commands.append(cmd)
             elif isinstance(block, RecorderBlock):
+                # Generate the recorder function and its invocation
                 cmd = self.render_recorder_block_to_str_code(block)
                 commands.append(cmd)
             elif isinstance(block, LawApiBlock):
@@ -173,7 +234,9 @@ class BlockService:
         functions_code = "\n\n".join(self.generated_functions.values())
         main_code = "\n".join(commands)
 
-        full_script = "import subprocess\n" f"{functions_code}\n\n{main_code}"
+        full_script = (
+            "import subprocess\nimport requests\n\n" f"{functions_code}\n\n{main_code}"
+        )
 
         return full_script
 
