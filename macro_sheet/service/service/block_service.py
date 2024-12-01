@@ -2,6 +2,7 @@ from typing import Any
 
 import httpx
 
+from macro_sheet.domain.block.api_block.law_api_block import LawApiBlock
 from macro_sheet.domain.block.base_block.loop_block import LoopBlock
 from macro_sheet.domain.block.base_block.main_block import MainBlock
 from macro_sheet.domain.block.base_block.reference_block import ReferenceBlock
@@ -12,6 +13,7 @@ from macro_sheet.domain.block.file_system_block.file_system_block import (
     FileSystemBlock,
     FileSystemType,
 )
+from macro_sheet.domain.block.mouse_keyboard_block.recorder_block import RecorderBlock
 from macro_sheet.domain.Function.block_function import BlockFunction
 from macro_sheet.domain.worksheet.worksheet import Worksheet
 
@@ -130,6 +132,12 @@ class BlockService:
         # Return the function call with proper indentation
         return f"{indent_str}{reference_id}()"
 
+    def render_api_block_to_str_code(self, block: LawApiBlock) -> str:
+        return "pass"
+
+    def render_recorder_block_to_str_code(self, block: RecorderBlock) -> str:
+        return "pass"
+
     def generate_script_from_worksheet(
         self, main_block: MainBlock, block_functions: list[BlockFunction]
     ) -> str:
@@ -151,6 +159,12 @@ class BlockService:
                 commands.append(cmd)
             elif isinstance(block, ReferenceBlock):
                 cmd = self.render_reference_block_to_str_code(block, block_functions)
+                commands.append(cmd)
+            elif isinstance(block, RecorderBlock):
+                cmd = self.render_recorder_block_to_str_code(block)
+                commands.append(cmd)
+            elif isinstance(block, LawApiBlock):
+                cmd = self.render_api_block_to_str_code(block)
                 commands.append(cmd)
             else:
                 raise TypeError(f"Unsupported block type: {type(block).__name__}")
@@ -235,7 +249,7 @@ class PowerShellConverter:
         """Generates search conditions for the PowerShell command."""
         # Determine the property to use based on the target type
         if block.target == FileSystemType.FILE:
-            name_property = "$_.BaseName"
+            name_property = "$_.Name"  # 확장자를 포함한 이름
         else:  # For FOLDER target
             name_property = "$_.Name"
 
