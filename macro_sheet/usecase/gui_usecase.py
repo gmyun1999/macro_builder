@@ -11,16 +11,18 @@ from macro_sheet.service.exception.exceptions import (
 )
 from macro_sheet.service.service.block_function_service import BlockFunctionService
 from macro_sheet.service.service.block_service import BlockService
-from macro_sheet.service.service.gui_service import GuiService
+from macro_sheet.service.service.command_gui_service import CommandGuiService
+from macro_sheet.service.service.recorder_gui_service import RecorderGuiService
 
 
 class GuiUseCase:
     def __init__(self) -> None:
-        self.gui_service = GuiService()
+        self.command_gui_service = CommandGuiService()
+        self.recorder_gui_service = RecorderGuiService()
         self.block_service = BlockService()
         self.block_function_service = BlockFunctionService()
 
-    def generate_gui(
+    def generate_command_gui(
         self,
         owner_id: str | None,
         main_block: MainBlock | None,
@@ -68,20 +70,20 @@ class GuiUseCase:
             main_block=main_block, block_functions=list(full_ancestors)
         )
 
-        script_hash = self.gui_service.create_script_hash_by_code(
+        script_hash = self.command_gui_service.create_script_hash_by_code(
             script_code=script_code
         )
-        script_vo = self.gui_service.get_script_by_hash(script_hash=script_hash)
+        script_vo = self.command_gui_service.get_script_by_hash(script_hash=script_hash)
         if script_vo:
             # 이미 존재하는 스크립트 이므로 관련 gui도 존재함. 왜냐면 gui와 스크립트는 같이 삭제되고 같이 생성됨
             # 따라서 패키징 하지않고 바로 gui data를 가져와서 link를 전달한다.
-            gui_vo = self.gui_service.get_gui_by_id(script_vo.gui_id)
+            gui_vo = self.command_gui_service.get_gui_by_id(script_vo.gui_id)
             download_link = gui_vo.url  # type: ignore
             return download_link
 
         self.block_service.convert_file_from_script(script_code)
         # 스크립트가 존재하지않으면 이 스크립트를 가지고와서 패키징 서버에 밀어넣은후에 s3 gui link ,script 모두 저장해야한다.
-        download_link = self.gui_service.get_gui_link(script_code=script_code)
+        download_link = self.command_gui_service.get_gui_link(script_code=script_code)
 
         gui_vo = Gui(
             id=str(uuid.uuid4()),
@@ -94,6 +96,9 @@ class GuiUseCase:
             gui_id=gui_vo.id,
             script_hash=script_hash,
         )
-        self.gui_service.save_gui_and_script(script=script_vo, gui=gui_vo)
+        self.command_gui_service.save_gui_and_script(script=script_vo, gui=gui_vo)
 
         return download_link
+
+    def get_recorder_gui_presigned_url(self) -> str | None:
+        return self.recorder_gui_service.get_presigned_url()

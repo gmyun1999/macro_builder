@@ -1,4 +1,4 @@
-POST {{macro-host}}/gui/
+POST {{macro-host}}/command-gui/
 Content-Type: application/json
 Authorization: Bearer {{macro-jwt}}
 
@@ -35,6 +35,31 @@ Authorization: Bearer {{macro-jwt}}
         "destination": "C:\\Users\\gmyun\\OneDrive\\바탕 화면\\매크로 테스트2",
         "rename": null
       },
+      {
+      "block_type" : "BASE_LOOP_BLOCK",
+        "iter_cnt" : "3",
+        "body" : [
+            {
+            "block_type": "RECORDER_BLOCK",
+            "body": {
+              "mouse_events": [
+                {"type": "mouse_move", "timestamp": 0.6201746463775635, "x": 728, "y": 345},
+                {"type": "mouse_move", "timestamp": 0.62746262550354, "x": 735, "y": 356},
+                {"type": "mouse_move", "timestamp": 0.6348810195922852, "x": 751, "y": 387},
+                {"type": "mouse_move", "timestamp": 0.6421928405761719, "x": 778, "y": 431},
+                {"type": "mouse_move", "timestamp": 0.6504206657409668, "x": 800, "y": 464}
+              ],
+              "keyboard_events": [
+                {"type": "keyboard_press", "timestamp": 8.471685409545898, "key": "t"},
+                {"type": "keyboard_press", "timestamp": 8.564444303512573, "key": "e"},
+                {"type": "keyboard_press", "timestamp": 8.65369200706482, "key": "s"},
+                {"type": "keyboard_press", "timestamp": 8.720302104949951, "key": "t"}
+              ]
+            }
+          }
+        ]
+      },
+
               {
             "block_type": "RECORDER_BLOCK",
             "body": {

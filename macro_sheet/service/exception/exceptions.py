@@ -124,3 +124,33 @@ class DownloadLinkNotFoundException(GenerateGuiException):
         detail: dict = {},
     ):
         super().__init__(message, detail)
+
+
+class RecorderStorageException(Exception):
+    """Recorder Storage 관련 기본 예외 클래스."""
+
+    code = "RECORDER_STORAGE_ERROR"
+
+    def __init__(
+        self, message: str = "Recorder Storage 관련 오류가 발생했습니다.", detail: dict = {}
+    ):
+        super().__init__(message)
+        self.detail = detail
+
+
+class PresignedUrlGenerationException(RecorderStorageException):
+    """프리사인드 URL 생성 실패 예외."""
+
+    code = "PRESIGNED_URL_GENERATION_FAILED"
+
+    def __init__(self, message: str = "프리사인드 URL 생성에 실패했습니다.", detail: dict = {}):
+        super().__init__(message, detail)
+
+
+class S3ClientInitializationException(RecorderStorageException):
+    """S3 클라이언트 초기화 실패 예외."""
+
+    code = "S3_CLIENT_INITIALIZATION_FAILED"
+
+    def __init__(self, message: str = "S3 클라이언트 초기화에 실패했습니다.", detail: dict = {}):
+        super().__init__(message, detail)

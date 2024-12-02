@@ -11,7 +11,7 @@ from macro_sheet.service.i_packaging_server.i_packaging_server import (
 from macro_sheet.service.i_repo.i_gui_repo import IGuiRepo, IScriptRepo
 
 
-class GuiService:
+class CommandGuiService:
     def __init__(self) -> None:
         # TODO: DI
         self.client: PackagingClientInterface = PackagingClient()

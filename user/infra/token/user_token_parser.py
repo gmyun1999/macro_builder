@@ -27,6 +27,8 @@ class UserTokenParser(ITokenParser):
                 return None, response_msg.TokenMessage.WRONG_TYPE.value
 
             if not payload[UserTokenPayload.FIELD_ROLE] in allowed_roles:
+                print(payload[UserTokenPayload.FIELD_ROLE])
+                print(allowed_roles)
                 return None, response_msg.TokenMessage.ROLE_NO_PERMISSION.value
 
             user_token_payload_vo = UserTokenPayload.from_dict(payload)

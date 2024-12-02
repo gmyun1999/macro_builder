@@ -5,7 +5,10 @@ from macro_sheet.interface.view.function_view import (
     GETMyFunctionListView,
     MYBlockFunctionView,
 )
-from macro_sheet.interface.view.gui_view import GenerateGuiView
+from macro_sheet.interface.view.gui_view import (
+    GenerateCommandGuiView,
+    GenerateRecorderGuiView,
+)
 from macro_sheet.interface.view.worksheet_view import (
     GETMyWorksheetListView,
     MYWorksheetView,
@@ -45,5 +48,14 @@ urlpatterns = [
         view=GETMyWorksheetListView.as_view(),
         name="bulk_fetch_my_worksheets",
     ),
-    path("gui/", view=GenerateGuiView.as_view(), name="generate_gui"),
+    path(
+        "command-gui/",
+        view=GenerateCommandGuiView.as_view(),
+        name="generate_command_gui",
+    ),
+    path(
+        "recorder-gui/",
+        view=GenerateRecorderGuiView.as_view(),
+        name="generate_recorder_gui",
+    ),
 ]

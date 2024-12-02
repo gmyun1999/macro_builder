@@ -13,12 +13,12 @@ from macro_sheet.domain.block.file_system_block.file_system_block import (
 from macro_sheet.domain.Function.block_function import BlockFunction
 from macro_sheet.domain.worksheet.worksheet import Worksheet
 from macro_sheet.service.service.block_service import BlockService
-from macro_sheet.service.service.gui_service import GuiService
+from macro_sheet.service.service.command_gui_service import CommandGuiService
 
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        gui_service = GuiService()
+        gui_service = CommandGuiService()
         block_service = BlockService()
 
         # 테스트 케이스 구현

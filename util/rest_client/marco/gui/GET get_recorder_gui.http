@@ -1,0 +1,3 @@
+GET {{macro-host}}/recorder-gui/
+Content-Type: application/json
+Authorization: Bearer {{macro-jwt}}

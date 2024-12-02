@@ -8,6 +8,6 @@ class UserRole(StrEnum):
 
 
 class UserRoles:
-    ADMIN_ROLES = [UserRole.ADMIN]
-    USER_ROLES = [UserRole.USER]
-    ALL_USER_ROLES = [UserRole.USER, UserRole.GUEST]
+    ADMIN_ROLES = [UserRole.ADMIN.value]
+    USER_ROLES = [UserRole.USER.value]
+    ALL_USER_ROLES = [UserRole.USER.value, UserRole.GUEST.value]

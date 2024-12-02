@@ -12,7 +12,7 @@ from user.infra.token.user_token_parser import UserTokenParser
 
 
 def validate_token(
-    roles: list = UserRoles.USER_ROLES,
+    roles: list = [UserRoles.USER_ROLES],
     validate_type: str = UserTokenType.ACCESS,
 ):
     def decorated_func(f):
