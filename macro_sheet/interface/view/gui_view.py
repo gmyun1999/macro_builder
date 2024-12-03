@@ -1,3 +1,5 @@
+import logging
+
 from pydantic import BaseModel, Field
 from rest_framework.views import APIView
 
@@ -13,6 +15,8 @@ from macro_sheet.usecase.gui_usecase import GuiUseCase
 from user.domain.user_role import UserRoles
 from user.domain.user_token import UserTokenPayload
 from user.interface.validator.user_token_validator import validate_token
+
+logger = logging.getLogger(__name__)
 
 
 class GenerateCommandGuiView(APIView):
@@ -52,8 +56,8 @@ class GenerateCommandGuiView(APIView):
             return success_response(
                 data=data, message="성공적으로 gui를 생성하였습니다.", status=200
             )
-
         except DownloadLinkNotFoundException as e:
+            logger.error("Download link not found: %s", e, exc_info=True)
             return error_response(code=e.code, message=str(e), status=502)
 
         except FunctionException as e:
