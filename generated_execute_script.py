@@ -3,7 +3,7 @@ import subprocess
 import requests
 
 
-def send_recorder_data_6b097a2b6b784b6dbf7c274edd961bc6():
+def send_recorder_data_6c3e83c05f91441f97729895e1d6236f():
     host = "127.0.0.1"
     port = 1000
     api_key = "test_key"
@@ -37,7 +37,7 @@ def send_recorder_data_6b097a2b6b784b6dbf7c274edd961bc6():
         print(f"에러: {str(e)}")
 
 
-def send_recorder_data_32725de51fa94b41b43cc443118d3776():
+def send_recorder_data_f1cb9e28a44c47d68f345674ff619201():
     host = "127.0.0.1"
     port = 1000
     api_key = "test_key"
@@ -71,7 +71,7 @@ def send_recorder_data_32725de51fa94b41b43cc443118d3776():
         print(f"에러: {str(e)}")
 
 
-def send_recorder_data_9881edbe7b1d4d31984e7806c3969165():
+def send_recorder_data_62e92e6d784046ce9ec1d0bc44f68b7c():
     host = "127.0.0.1"
     port = 1000
     api_key = "test_key"
@@ -127,9 +127,9 @@ for _ in range(3):
         check=True,
     )
     for _ in range(3):
-        send_recorder_data_6b097a2b6b784b6dbf7c274edd961bc6()
-    send_recorder_data_32725de51fa94b41b43cc443118d3776()
-    send_recorder_data_9881edbe7b1d4d31984e7806c3969165()
+        send_recorder_data_6c3e83c05f91441f97729895e1d6236f()
+    send_recorder_data_f1cb9e28a44c47d68f345674ff619201()
+    send_recorder_data_62e92e6d784046ce9ec1d0bc44f68b7c()
 subprocess.run(
     [
         "powershell",
