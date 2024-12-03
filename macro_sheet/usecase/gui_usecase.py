@@ -86,11 +86,7 @@ class GuiUseCase:
         # 스크립트가 존재하지않으면 이 스크립트를 가지고와서 패키징 서버에 밀어넣은후에 s3 gui link ,script 모두 저장해야한다.
         download_link = self.command_gui_service.get_gui_link(script_code=script_code)
 
-        gui_vo = Gui(
-            id=str(uuid.uuid4()),
-            name=str(uuid.uuid4()),
-            url=download_link,
-        )
+        gui_vo = Gui(id=str(uuid.uuid4()), name=str(uuid.uuid4()), url=download_link)
         script_vo = Script(
             id=str(uuid.uuid4()),
             script_code=script_code,

@@ -24,7 +24,7 @@ class CommandGuiService:
         어떤 형태로 해서 바로 패키지 서버로 보낸다음
         패키지 서버로부터 s3 link를 받는다.
         """
-        download_url = self.client.send_to_package_server(script_content=script_code)
+        download_url = self.client.get_gui_link(script_content=script_code)
         return download_url
 
     def create_script_hash_by_code(self, script_code: str) -> str:
