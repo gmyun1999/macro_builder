@@ -65,14 +65,14 @@ LOGGING = {
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            # "formatter": "simple",
+            "formatter": "verbose",  # simple 대신 verbose 사용
         },
         "file": {
             "formatter": "verbose",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": "logs/debug.log",
-            "backupCount": 1,  # keep at most 10 log files
-            "maxBytes": 5 * 1024 * 1024,  # 5*1024*1024 bytes (5MB)
+            "backupCount": 10,  # 유지할 로그 파일 개수 증가
+            "maxBytes": 5 * 1024 * 1024,  # 5MB
             "encoding": "utf-8",
         },
     },
@@ -80,9 +80,26 @@ LOGGING = {
         "django": {
             "handlers": ["file", "console"],
             "level": "INFO",
+            "propagate": True,
+        },
+        "django.server": {
+            "handlers": ["file", "console"],
+            "level": "INFO",  # 요청/응답 로깅
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["file", "console"],
+            "level": "ERROR",  # 500 에러 로깅
+            "propagate": False,
+        },
+        "rest_framework": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG",  # DRF 요청/응답 디버깅
+            "propagate": False,
         },
     },
 }
+
 
 ALLOWED_HOSTS = ["43.203.255.198", "127.0.0.1", "localhost"]
 CORS_ORIGIN_ALLOW_ALL = True
