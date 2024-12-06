@@ -46,7 +46,9 @@ class GenerateCommandGuiView(APIView):
         try:
             dicted_main_block = MainBlock.from_dict(body.main_block)
         except (ValueError, AttributeError) as e:
-            return error_response(message="유효하지 않은 블록 형식입니다.", status=400)
+            return error_response(
+                detail={"detail": str(e)}, message="유효하지 않은 블록 형식입니다.", status=400
+            )
 
         try:
             download_link = self.gui_use_case.generate_command_gui(
@@ -58,7 +60,7 @@ class GenerateCommandGuiView(APIView):
             )
         except DownloadLinkNotFoundException as e:
             logger.error("Download link not found: %s", e, exc_info=True)
-            return error_response(code=e.code, message=str(e), status=502)
+            return error_response(code=e.code, message=str(e), status=503)
 
         except FunctionException as e:
             return error_response(
@@ -91,4 +93,4 @@ class GenerateRecorderGuiView(APIView):
             )
 
         except RecorderStorageException as e:
-            return error_response(code=e.code, message=str(e), status=502)
+            return error_response(code=e.code, message=str(e), status=503)

@@ -8,7 +8,7 @@ Authorization: Bearer {{macro-jwt}}
   "main_block": {
     "block_type": "MAIN_BLOCK",
     "body": [
-            {
+      {
         "block_type": "FILE_SYSTEM_BLOCK",
         "target": "FILE",
         "action": "MOVE",

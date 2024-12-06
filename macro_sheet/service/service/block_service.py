@@ -149,7 +149,7 @@ class BlockService:
         return "pass"
 
     def render_recorder_block_to_str_code(
-        self, block: RecorderBlock, indent: str = 4
+        self, block: RecorderBlock, indent: int = 4
     ) -> str:
         """
         Renders a RecorderBlock to a dynamically generated Python function and
@@ -176,7 +176,7 @@ class BlockService:
         function_body = (
             f"def {function_name}():\n"
             f'{function_indent_str}host = "127.0.0.1"\n'
-            f"{function_indent_str}port = 1000\n"
+            f"{function_indent_str}port = 5262\n"
             f'{function_indent_str}api_key = "test_key"\n'
             f'{function_indent_str}endpoint = "/execute_recorder/"\n'
             f'{function_indent_str}url = f"http://{{host}}:{{port}}{{endpoint}}"\n\n'
