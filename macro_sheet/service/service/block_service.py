@@ -168,7 +168,7 @@ class BlockService:
         # Extract block data and prepare payload
         backend_server = settings.BACKEND_HOST
         api_url = f"{backend_server}/ko_law/"
-        access_key = "settings.COMMAND_GUI_ACCESS_KEY"  # Django 설정에서 가져옴
+        access_key = settings.COMMAND_GUI_ACCESS_KEY  # Django 설정에서 가져옴
         condition_map = {
             LawConditionDetail.KEYWORD: "query",
             LawConditionDetail.EFFECTIVE_DATE: "efYd",
