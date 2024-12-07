@@ -117,9 +117,19 @@ class KoLawApiServer:
                 )
             )
 
-        # DB에 한 번에 저장
-        KoLawList.objects.bulk_create(bulk_objects, ignore_conflicts=True)  # 중복된 경우 무시
-        print(f"DB에 {len(bulk_objects)}개의 데이터를 저장했습니다.")
+        try:
+            # DB에 한 번에 저장
+            KoLawList.objects.bulk_create(
+                bulk_objects, ignore_conflicts=True
+            )  # 중복된 경우 무시
+            print(f"DB에 {len(bulk_objects)}개의 데이터를 저장했습니다.")
+        except Exception as e:
+            # 예외 발생 시, 디버깅 정보를 출력
+            print("[ERROR] bulk_create 실패:")
+            print(f"Exception: {e}")
+            print("저장 시도한 데이터:")
+            for obj in bulk_objects:
+                print(vars(obj))
 
     def bulk_request_total_law_list_data(self):
         """
