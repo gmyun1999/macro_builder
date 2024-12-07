@@ -1,7 +1,4 @@
-import uuid
 from typing import Any
-
-import httpx
 
 from macro_sheet.domain.block.api_block.law_api_block import LawApiBlock
 from macro_sheet.domain.block.base_block.loop_block import LoopBlock

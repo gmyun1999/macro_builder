@@ -1,0 +1,9 @@
+POST {{macro-host}}/ko_law/
+Content-Type: application/json
+
+{
+    "access_key": "~~",
+    "query": "소방",
+    "efYd": "20170726~20240930",
+    "org_name": "소방청"
+}

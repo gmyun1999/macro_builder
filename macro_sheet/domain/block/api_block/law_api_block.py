@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
@@ -8,9 +7,9 @@ from macro_sheet.domain.registry import register_block_type
 
 
 class LawConditionDetail(StrEnum):
-    KEYWORD = "KEYWORD"
-    EFFECTIVE_DATE = "EFFECTIVE_DATE"
-    MINISTRY = "MINISTRY"
+    KEYWORD = "KEYWORD"  # 검색어
+    EFFECTIVE_DATE = "EFFECTIVE_DATE"  # 시행일자 범위
+    MINISTRY = "MINISTRY"  # 소관부처
 
 
 class LawDataType(StrEnum):

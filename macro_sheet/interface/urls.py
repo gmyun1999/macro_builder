@@ -9,6 +9,7 @@ from macro_sheet.interface.view.gui_view import (
     GenerateCommandGuiView,
     GenerateRecorderGuiView,
 )
+from macro_sheet.interface.view.ko_law_view import FetchKoLawApi
 from macro_sheet.interface.view.worksheet_view import (
     GETMyWorksheetListView,
     MYWorksheetView,
@@ -57,5 +58,9 @@ urlpatterns = [
         "recorder-gui/",
         view=GenerateRecorderGuiView.as_view(),
         name="generate_recorder_gui",
+    ),
+    path(
+        "ko_law/",
+        view=FetchKoLawApi.as_view(),
     ),
 ]
