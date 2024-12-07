@@ -177,7 +177,7 @@ class BlockService:
 
         # Prepare payload by mapping conditions to API keys
         payload = {
-            "access_key": f"settings.{access_key}",
+            "access_key": access_key,
             "query": "",
             "efYd": "",
             "org_name": "",
