@@ -1,6 +1,10 @@
 from typing import Any
 
-from macro_sheet.domain.block.api_block.law_api_block import LawApiBlock
+from macro_be import settings
+from macro_sheet.domain.block.api_block.law_api_block import (
+    LawApiBlock,
+    LawConditionDetail,
+)
 from macro_sheet.domain.block.base_block.loop_block import LoopBlock
 from macro_sheet.domain.block.base_block.main_block import MainBlock
 from macro_sheet.domain.block.base_block.reference_block import ReferenceBlock
@@ -143,11 +147,78 @@ class BlockService:
         # Return the function call with proper indentation
         return f"{indent_str}{reference_id}()"
 
-    def render_api_block_to_str_code(self, block: LawApiBlock) -> str:
-        return "pass"
+    def render_api_block_to_str_code(self, block: LawApiBlock, indent: int = 0) -> str:
+        """
+        Renders a LawApiBlock to a dynamically generated Python function and
+        returns the function call code.
+
+        Function definition is stored in `self.generated_functions`.
+
+        Args:
+            block (LawApiBlock): The LawApiBlock to convert.
+            indent (int): Number of spaces to indent the function body.
+        """
+        function_indent = 4
+        function_indent_str = " " * function_indent
+        indent_str = " " * indent
+
+        # Generate a unique function name based on the counter
+        function_name = f"send_law_data_request_{self.function_number}"
+
+        # Extract block data and prepare payload
+        backend_server = settings.BACKEND_HOST
+        api_url = f"{backend_server}/ko_law/"
+        access_key = "settings.COMMAND_GUI_ACCESS_KEY"  # Django 설정에서 가져옴
+        condition_map = {
+            LawConditionDetail.KEYWORD: "query",
+            LawConditionDetail.EFFECTIVE_DATE: "efYd",
+            LawConditionDetail.MINISTRY: "org_name",
+        }
+
+        # Prepare payload by mapping conditions to API keys
+        payload = {
+            "access_key": f"settings.{access_key}",
+            "query": "",
+            "efYd": "",
+            "org_name": "",
+        }
+
+        for condition in block.condition:
+            if condition is not None:
+                for key, value in condition.items():
+                    payload_key = condition_map.get(key)
+                    if payload_key:
+                        payload[payload_key] = value
+
+        safe_loc = repr(block.loc)
+        # Define the function code with controlled indentation
+        function_body = (
+            f"def {function_name}():\n"
+            f'{function_indent_str}url = "{api_url}"\n'
+            f"{function_indent_str}headers = {{'Content-Type': 'application/json'}}\n"
+            f"{function_indent_str}payload = {payload}\n\n"
+            f"{function_indent_str}response = requests.post(url, json=payload, headers=headers)\n\n"
+            f"{function_indent_str}if response.status_code != 200:\n"
+            f'{function_indent_str * 2}print(f"요청 실패: {{response.status_code}}, {{response.text}}")\n'
+            f"{function_indent_str * 2}return\n\n"
+            f"{function_indent_str}compressed_data = io.BytesIO(response.content)\n"
+            f"{function_indent_str}with gzip.GzipFile(fileobj=compressed_data, mode='rb') as gz:\n"
+            f"{function_indent_str * 2}csv_data = gz.read().decode('utf-8-sig')\n\n"
+            f"{function_indent_str}output_file = {safe_loc}\n"
+            f"{function_indent_str}with open(output_file, 'w', encoding='utf-8-sig') as file:\n"
+            f"{function_indent_str * 2}file.write(csv_data)\n\n"
+            f"{function_indent_str}print(f'CSV 파일이 저장되었습니다: {{output_file}}')\n"
+        )
+
+        # Store the function definition in `self.generated_functions`
+        self.generated_functions[function_name] = function_body
+        self.function_number += 1
+
+        # Return the function call code
+        return f"{indent_str}{function_name}()"
 
     def render_recorder_block_to_str_code(
-        self, block: RecorderBlock, indent: int = 4
+        self, block: RecorderBlock, indent: int = 0
     ) -> str:
         """
         Renders a RecorderBlock to a dynamically generated Python function and
@@ -232,7 +303,8 @@ class BlockService:
         main_code = "\n".join(commands)
 
         full_script = (
-            "import subprocess\nimport requests\n\n" f"{functions_code}\n\n{main_code}"
+            "import subprocess\nimport gzip\nimport io\nimport requests\n\n"
+            f"{functions_code}\n\n{main_code}"
         )
 
         return full_script

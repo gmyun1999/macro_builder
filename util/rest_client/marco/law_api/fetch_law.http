@@ -2,7 +2,7 @@ POST {{macro-host}}/ko_law/
 Content-Type: application/json
 
 {
-    "access_key": "~~",
+    "access_key": "F7r#h@!x9L3vW2$kPq8&dsQ",
     "query": "소방",
     "efYd": "20170726~20240930",
     "org_name": "소방청"
