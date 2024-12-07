@@ -142,3 +142,5 @@ temp/
 .vscode/
 */.DS_Store
 *.pdf
+
+generated_execute_script.py

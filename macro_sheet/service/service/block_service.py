@@ -23,6 +23,7 @@ class BlockService:
     def __init__(self):
         self.powershell_converter = PowerShellConverter()
         self.generated_functions = {}
+        self.function_number = 0  # 함수 자동생성할떄 뒤에붙는 숫자
 
     def convert_file_system_block_to_str_code(
         self, block: FileSystemBlock, indent=0, encoding="utf-8"
@@ -164,12 +165,11 @@ class BlockService:
         """
         function_indent = 4
         # Generate a unique function name based on the counter
-        function_name = f"send_recorder_data_{uuid.uuid4().hex}"
+        function_name = f"send_recorder_data_{self.function_number}"
 
         # Recorder block's data (convert to dict if necessary)
         recorder_data = block.body  # Assuming RecorderBlock has a `to_dict()` method
 
-        # Indent strings
         function_indent_str = " " * function_indent
         indent_str = " " * indent
         # Define the function code with controlled indentation
@@ -194,7 +194,7 @@ class BlockService:
 
         # Store the function definition in `self.generated_functions`
         self.generated_functions[function_name] = function_body
-
+        self.function_number += 1
         # Return the function call code
         return f"{indent_str}{function_name}()"
 

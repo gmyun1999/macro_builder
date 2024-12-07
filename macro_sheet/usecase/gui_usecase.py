@@ -73,6 +73,7 @@ class GuiUseCase:
         script_hash = self.command_gui_service.create_script_hash_by_code(
             script_code=script_code
         )
+
         script_vo = self.command_gui_service.get_script_by_hash(script_hash=script_hash)
         if script_vo:
             # 이미 존재하는 스크립트 이므로 관련 gui도 존재함. 왜냐면 gui와 스크립트는 같이 삭제되고 같이 생성됨
