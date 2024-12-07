@@ -83,7 +83,7 @@ class GenerateRecorderGuiView(APIView):
             owner_id = token_payload.guest_id
 
         try:
-            pre_signed_url = self.gui_use_case.get_recorder_gui_presigned_url()
+            pre_signed_url = self.gui_use_case.get_recorder_gui_download_link()
             data = {"pre_signed_url": pre_signed_url}
 
             return success_response(

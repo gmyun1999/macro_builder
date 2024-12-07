@@ -165,7 +165,11 @@ class Command(BaseCommand):
         )
 
         # 2. 생성된 파일을 패키징 서버로 전송
-        download_link = gui_service.get_gui_link(script_code)
+        download_link = (
+            gui_service.get_packaged_gui_download_link_from_packaging_server(
+                script_code
+            )
+        )
 
         # 3. 응답 출력
         if download_link:

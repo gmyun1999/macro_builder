@@ -1,10 +1,19 @@
-from macro_sheet.infra.s3_recorder_storage import S3RecorderStorage
-from macro_sheet.service.i_recorder_storage.i_recorder_storage import IRecorderStorage
+from macro_be import settings
+from macro_sheet.infra.s3 import S3Storage
+from macro_sheet.service.i_storage.i_storage import IStorage
 
 
 class RecorderGuiService:
     def __init__(self) -> None:
-        self.recorder_storage: IRecorderStorage = S3RecorderStorage()
+        self.recorder_storage: IStorage = S3Storage(
+            access_key_id=settings.RECORDER_S3_ACCESS_KEY,
+            secret_access_key=settings.RECORDER_S3_SECRET_KEY,
+            region_name="ap-northeast-2",
+        )
 
-    def get_presigned_url(self) -> str | None:
-        return self.recorder_storage.generate_presigned_url()
+    def get_recorder_gui_download_link(self) -> str | None:
+        return self.recorder_storage.generate_presigned_url(
+            bucket_name=settings.RECORDER_S3_BUCKET,
+            object_key=settings.RECORDER_S3_OBJECT_KEY,
+            expiration=300,
+        )

@@ -3,29 +3,43 @@ import hashlib
 from django.db import transaction
 
 from macro_sheet.domain.gui.gui import Gui, Script
-from macro_sheet.infra.packing_server import PackagingClient
+from macro_sheet.infra.packing_server import PackagingServer
+from macro_sheet.infra.pyqt_command_gui_server import PyQtCommandGuiServer
 from macro_sheet.infra.repo.gui_repo import GuiRepo, ScriptRepo
-from macro_sheet.service.i_packaging_server.i_packaging_server import (
-    PackagingClientInterface,
+from macro_sheet.service.i_command_gui_server.i_command_gui_server import (
+    ICommandGuiServer,
 )
+from macro_sheet.service.i_packaging_server.i_packaging_server import IPackagingServer
 from macro_sheet.service.i_repo.i_gui_repo import IGuiRepo, IScriptRepo
 
 
 class CommandGuiService:
     def __init__(self) -> None:
         # TODO: DI
-        self.client: PackagingClientInterface = PackagingClient()
+        self.client: IPackagingServer = PackagingServer()
         self.gui_repo: IGuiRepo = GuiRepo()
         self.script_repo: IScriptRepo = ScriptRepo()
+        self.command_gui_service: ICommandGuiServer = PyQtCommandGuiServer()
 
-    def get_gui_link(self, script_code: str) -> str:
+    """============================================================================================"""
+    """================================ packaging 서버 관련(under) ================================="""
+    """============================================================================================"""
+
+    def get_packaged_gui_download_link_from_packaging_server(
+        self, script_code: str
+    ) -> str:
         """
-        script code를 로컬에 저장하는건 아닌거같고,
-        어떤 형태로 해서 바로 패키지 서버로 보낸다음
-        패키지 서버로부터 s3 link를 받는다.
+        packaging 서버로 부터 script code를 넘겨서
+        packaging된 폴더의 link를 받아온다.
         """
-        download_url = self.client.send_to_package_server(script_content=script_code)
+        download_url = self.client.get_packaged_download_link(
+            script_content=script_code
+        )
         return download_url
+
+    """============================================================================================"""
+    """================================ gui, gui_script 엔티티 관련(under) ========================="""
+    """============================================================================================"""
 
     def create_script_hash_by_code(self, script_code: str) -> str:
         """
@@ -34,6 +48,9 @@ class CommandGuiService:
         return hashlib.sha256(script_code.encode("utf-8")).hexdigest()
 
     def is_same_script_code(self, script_code: str) -> bool:
+        """
+        command_gui에서 동작하는 script_code가 이미 존재하는지 확인
+        """
         script_hash = self.create_script_hash_by_code(script_code=script_code)
         return self.script_repo.is_same_script_code(script_hash=script_hash)
 
@@ -48,7 +65,7 @@ class CommandGuiService:
 
     def save_gui(self, gui: Gui):
         """
-        gui link를 받아서 저장하는거. 모델이 필요할듯.
+        gui link를 받아서 저장하는거
         """
         return self.gui_repo.create(gui_vo=gui)
 
@@ -63,17 +80,3 @@ class CommandGuiService:
         with transaction.atomic():
             self.save_gui(gui=gui)
             self.save_script(script=script)
-
-    def delete_gui(self, gui: Gui):
-        """
-        gui 삭제
-        """
-        pass
-
-    def modify_gui(
-        self,
-    ):
-        """
-        변경같은거없음 기존꺼 지우고 다시 s3에 올리는건데, 굳이? 그냥 냅두고싶음
-        """
-        pass

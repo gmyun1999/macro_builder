@@ -85,7 +85,9 @@ class GuiUseCase:
         # 밑의 주석 해제하면 local 테스트 용으로 로컬에서 스크립트를 생성함.
         # self.block_service.convert_file_from_script(script_code)
         # 스크립트가 존재하지않으면 이 스크립트를 가지고와서 패키징 서버에 밀어넣은후에 s3 gui link ,script 모두 저장해야한다.
-        download_link = self.command_gui_service.get_gui_link(script_code=script_code)
+        download_link = self.command_gui_service.get_packaged_gui_download_link_from_packaging_server(
+            script_code=script_code
+        )
 
         gui_vo = Gui(
             id=str(uuid.uuid4()),
@@ -102,5 +104,5 @@ class GuiUseCase:
 
         return download_link
 
-    def get_recorder_gui_presigned_url(self) -> str | None:
-        return self.recorder_gui_service.get_presigned_url()
+    def get_recorder_gui_download_link(self) -> str | None:
+        return self.recorder_gui_service.get_recorder_gui_download_link()

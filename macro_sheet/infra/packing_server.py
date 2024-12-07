@@ -4,16 +4,14 @@ import httpx
 
 from macro_be.settings import PACKAGE_SERVER_URL
 from macro_sheet.service.exception.exceptions import DownloadLinkNotFoundException
-from macro_sheet.service.i_packaging_server.i_packaging_server import (
-    PackagingClientInterface,
-)
+from macro_sheet.service.i_packaging_server.i_packaging_server import IPackagingServer
 
 
-class PackagingClient(PackagingClientInterface):
+class PackagingServer(IPackagingServer):
     def __init__(self, base_url: str = PACKAGE_SERVER_URL):
         self.base_url = base_url
 
-    def send_to_package_server(self, script_content: str) -> str:
+    def get_packaged_download_link(self, script_content: str) -> str:
         """
         패키징 서버에 스크립트를 문자열로 업로드하고 GUI 다운로드 링크를 반환한다.
         """
