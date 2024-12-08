@@ -28,7 +28,7 @@ class PydanticToDjangoSerializer:
 
     @classmethod
     def convert(
-        cls, pydantic_model: Type[BaseModel], serializer_name: str = None
+        cls, pydantic_model: Type[BaseModel], serializer_name: str | None = None
     ) -> Type[serializers.Serializer]:
         """
         Pydantic 모델을 Django 시리얼라이저 클래스로 변환
@@ -76,7 +76,7 @@ class PydanticToDjangoSerializer:
 
     @classmethod
     def _create_field(
-        cls, field_type: Any, field_info: FieldInfo, required: bool = None
+        cls, field_type: Any, field_info: FieldInfo, required: bool | None = None
     ) -> serializers.Field:
         """
         필드 타입과 정보를 바탕으로 Django 시리얼라이저 필드 생성
