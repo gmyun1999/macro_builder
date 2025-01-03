@@ -17,7 +17,6 @@ from macro_sheet.domain.block.file_system_block.file_system_block import (
 )
 from macro_sheet.domain.block.mouse_keyboard_block.recorder_block import RecorderBlock
 from macro_sheet.domain.Function.block_function import BlockFunction
-from macro_sheet.domain.worksheet.worksheet import Worksheet
 
 
 class BlockService:

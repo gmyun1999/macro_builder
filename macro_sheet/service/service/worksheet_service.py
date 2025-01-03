@@ -1,5 +1,3 @@
-from typing import cast
-
 from django.db import transaction
 
 from macro_sheet.domain.worksheet.worksheet import Worksheet as WorksheetVo

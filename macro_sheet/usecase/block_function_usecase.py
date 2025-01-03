@@ -87,7 +87,7 @@ class BlockFunctionUseCase:
         ):
             raise FunctionCircularException(function_id)
 
-        return self.block_function_service.update_block_function_with_closure_function(
+        return self.block_function_service.update_block_function(
             block_function_obj=block_function,
             new_parent_function_ids=related_function_ids,
         )
