@@ -1,4 +1,9 @@
-# Django 프로젝트 구동하기
+# 간단한 블록으로 조립하여서 매크로를 생성할 수 있는 프로젝트입니다.
+## 시연영상
+https://github.com/user-attachments/assets/e4079aa1-b47c-41c6-aa81-5ee1bebfa448
+
+
+## Django 프로젝트 구동하기
 
 이 README 파일은 기존 Django 프로젝트를 구동하는 방법을 안내합니다. Poetry를 사용한 의존성 관리, pre-commit 설정, mypy 설치, 그리고 Python 3.11 사용에 대해 설명합니다.
 
