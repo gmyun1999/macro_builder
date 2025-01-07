@@ -6,7 +6,8 @@ https://github.com/user-attachments/assets/e4079aa1-b47c-41c6-aa81-5ee1bebfa448
 ## Django 프로젝트 구동하기
 
 이 README 파일은 기존 Django 프로젝트를 구동하는 방법을 안내합니다. 
-이 프로젝트는 Dev Container를 사용하여 간단히 개발 환경을 설정할 수 있도록 구성되어 있습니다. Docker를 이용하려면 여기를 클릭하세
+이 프로젝트는 Dev Container를 사용하여 간단히 개발 환경을 설정할 수 있도록 구성되어 있습니다. Docker를 이용하려면 [docker](#7-docker&&vscode)를 클릭하세요
+
 ## 목차
 1. [Python 3.11 설치](#1-python-311-설치)
 2. [Poetry 설치](#2-poetry-설치)
