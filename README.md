@@ -5,8 +5,8 @@ https://github.com/user-attachments/assets/e4079aa1-b47c-41c6-aa81-5ee1bebfa448
 
 ## Django 프로젝트 구동하기
 
-이 README 파일은 기존 Django 프로젝트를 구동하는 방법을 안내합니다. Poetry를 사용한 의존성 관리, pre-commit 설정, mypy 설치, 그리고 Python 3.11 사용에 대해 설명합니다.
-
+이 README 파일은 기존 Django 프로젝트를 구동하는 방법을 안내합니다. 
+이 프로젝트는 Dev Container를 사용하여 간단히 개발 환경을 설정할 수 있도록 구성되어 있습니다. Docker를 이용하려면 여기를 클릭하세
 ## 목차
 1. [Python 3.11 설치](#1-python-311-설치)
 2. [Poetry 설치](#2-poetry-설치)
@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/e4079aa1-b47c-41c6-aa81-5ee1bebfa448
 4. [pre-commit 설정](#4-pre-commit-설정)
 5. [mypy 설치 및 실행](#5-mypy-설치-및-실행)
 6. [프로젝트 실행](#6-프로젝트-실행)
-
+7. [docker](#7-docker&&vscode)
 ## 1. Python 3.11 설치
 
 1. 글로벌 하게 깔려면 [Python 공식 웹사이트](https://www.python.org/downloads/)에서 Python 3.11 버전을 다운로드합니다.
@@ -88,7 +88,16 @@ https://github.com/user-attachments/assets/e4079aa1-b47c-41c6-aa81-5ee1bebfa448
    ```
 4. 웹 브라우저에서 `http://127.0.0.1:8000/`로 접속하여 프로젝트를 확인합니다.
 
-## 추가 명령어
+## 7. docker
 
+vscode 의 dev container와 vscode 를 사용하여 단 한번에 개발환경을 주인장과 동일하게 만듭니다.
+
+1. [dev container vs extension 설치](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+2. VS Code Command Palette(Ctrl+Shift+P 또는 Cmd+Shift+P)를 열고, 다음 명령어를 실행합니다
+   ```
+   Remote-Containers: Reopen in Container
+   ```
+3. 기다립니다.
+4. [프로젝트 실행](#6-프로젝트-실행)을 실행시킵니다.
 
 
