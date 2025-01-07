@@ -1,0 +1,39 @@
+{
+  "name": "Python Dev Container",
+  "build": {
+    "dockerfile": "./Dockerfile.dev",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.pythonPath": "/usr/local/bin/python",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        "onjayamanne.githistory",
+        "huizhou.githd",
+        "mhutchie.git-graph",
+        "ms-python.debugpy",
+        "ms-python.mypy-type-checker",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "kevinrose.vsc-python-indent",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "ms-vscode-remote.remote-ssh",
+        "ms-vscode-remote.remote-ssh-edit",
+        "ms-vscode-remote.remote-wsl",
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "pomdtr.excalidraw-editor",
+        "humao.rest-client",
+        "ms-vscode.remote-explorer"
+      ]
+    }
+  },
+  "postCreateCommand": "poetry install",
+  "forwardPorts": [8000],
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace"
+}
