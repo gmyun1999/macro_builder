@@ -30,7 +30,4 @@ RUN poetry install --no-root
 # 소스 코드 복사
 COPY . .
 
-# 기본 명령어 설정 (Django 서버 실행)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-
 EXPOSE 8000
