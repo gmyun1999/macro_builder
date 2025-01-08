@@ -1,7 +1,6 @@
 # Python 3.11 Slim 이미지 기반
 FROM python:3.11-slim
 
-# 작업 디렉터리 설정
 WORKDIR /workspace
 
 # 시스템 종속성 설치
@@ -14,20 +13,28 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Poetry 설치
-RUN curl -sSL https://install.python-poetry.org | python3 -
-
-# Poetry PATH 설정
+# 전역 PATH 설정 (Poetry 설치 후 사용을 위함)
 ENV PATH="/root/.local/bin:$PATH"
 
-# Poetry 환경 설정
-RUN poetry config virtualenvs.create false
+# 전체 프로젝트 파일 복사
+COPY . ./
 
-# 프로젝트 종속성 설치
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-root
-
-# 소스 코드 복사
-COPY . .
+# 환경에 따라 자동으로 의존성 관리자 설치 및 의존성 설치
+RUN if [ -f pyproject.toml ]; then \
+        echo "Poetry 환경 감지됨. Poetry 설치 및 의존성 설치 시작." && \
+        curl -sSL https://install.python-poetry.org | python3 - && \
+        poetry config virtualenvs.create false && \
+        poetry install --no-root; \
+    elif [ -f Pipfile ]; then \
+        echo "Pipenv 환경 감지됨. Pipenv 설치 및 의존성 설치 시작." && \
+        pip install --upgrade pip && pip install pipenv && \
+        pipenv install --system --deploy; \
+    elif [ -f requirements.txt ]; then \
+        echo "Pip 환경 감지됨. Pip을 통한 의존성 설치 시작." && \
+        pip install --upgrade pip && \
+        pip install -r requirements.txt; \
+    else \
+        echo "의존성 관리 파일을 찾을 수 없습니다."; \
+    fi
 
 EXPOSE 8000

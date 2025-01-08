@@ -32,7 +32,7 @@
       ]
     }
   },
-  "postCreateCommand": "poetry install && pre-commit autoupdate && pre-commit install",
+  "postCreateCommand": "pre-commit autoupdate && pre-commit install",
   "forwardPorts": [8000],
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
   "workspaceFolder": "/workspace"
