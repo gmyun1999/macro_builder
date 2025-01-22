@@ -1,7 +1,8 @@
 # 간단한 블록으로 조립하여서 매크로를 생성할 수 있는 프로젝트입니다.
 
 ## 프로젝트 아키텍처
-![image](https://github.com/user-attachments/assets/9a9d3f40-b22e-4056-a00e-17c61dcc25b8)
+<img src="https://github.com/user-attachments/assets/9a9d3f40-b22e-4056-a00e-17c61dcc25b8" alt="프로젝트 아키텍처" width="500">
+
 
 ## 시연영상
 https://github.com/user-attachments/assets/e4079aa1-b47c-41c6-aa81-5ee1bebfa448
