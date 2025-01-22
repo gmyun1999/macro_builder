@@ -1,4 +1,4 @@
-# 간단한 블록으로 조립하여서 매크로를 생성할 수 있는 프로젝트입니다.
+# 블록기반 인터페이스 매크로빌더
 
 ## 프로젝트 아키텍처
 <img src="https://github.com/user-attachments/assets/9a9d3f40-b22e-4056-a00e-17c61dcc25b8" alt="프로젝트 아키텍처" width="500">
