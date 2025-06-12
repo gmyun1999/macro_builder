@@ -1,9 +1,5 @@
 # 블록기반 인터페이스 매크로빌더
 
-## 프로젝트 아키텍처
-<img src="https://github.com/user-attachments/assets/9a9d3f40-b22e-4056-a00e-17c61dcc25b8" alt="프로젝트 아키텍처" width="500">
-
-
 ## 시연영상
 https://github.com/user-attachments/assets/e4079aa1-b47c-41c6-aa81-5ee1bebfa448
 
